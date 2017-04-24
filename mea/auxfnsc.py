@@ -22,11 +22,10 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 sys.path.insert(0, currentdir)
 
-from auxiliary_fn import auxiliary_fn as aux_fn
-import kramerskronig as kk
-import acon 
-import green
-import nambu
+from mea import auxfn
+from mea.tools import kramerskronig as kk
+from mea import acon 
+from mea.model import green, nambu
 
 
 # Notations:
@@ -179,7 +178,7 @@ class GFAuxSC():
 
         # acon of the normal part
         green.save_gf_c("self_moy_normal.dat", self.zn_vec, green.ir_to_c(self.sEvec_normal_ir))        
-        self.aux_normal = aux_fn.GFAux(fin_sE_to="self_moy_normal.dat")
+        self.aux_normal = auxfn.GFAux(fin_sE_to="self_moy_normal.dat")
         self.aux_normal.ac(fin_OME_default, fin_OME_other, fin_OME_input) ; self.aux_normal.get_sEvec_w_list()
         self.sE_w_ir_normal_list = self.aux_normal.sEvec_irw_list
         self.w_vec_list = self.aux_normal.w_vec_list

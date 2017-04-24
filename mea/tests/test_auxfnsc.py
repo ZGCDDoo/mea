@@ -37,7 +37,7 @@ class TestGFAuxSC(unittest.TestCase):
     def test_init(self):
         """ """
         fin_sE_to = os.path.join(currentdir, "files/self_moy_sc_b60tp04n0495U6500.dat")
-        gf_aux = auxfn_sc.GFAuxSC(fin_sE_to=fin_sE_to)
+        gf_aux = auxfnsc.GFAuxSC(fin_sE_to=fin_sE_to)
         
         self.assertEqual(gf_aux.zn_col, 0)
         self.assertEqual(gf_aux.fin_sE_to, fin_sE_to)
@@ -50,7 +50,7 @@ class TestGFAuxSC(unittest.TestCase):
 
         fin_sE_to = os.path.join(currentdir, "files/self_moy_sc_b60tp04n0495U6500.dat")
         (zn_vec, sE_c) = nambu.read_nambu_c(fin_sE_to)
-        gf_aux = auxfn_sc.GFAuxSC(fin_sE_to=fin_sE_to)
+        gf_aux = auxfnsc.GFAuxSC(fin_sE_to=fin_sE_to)
         gf_aux.build_gfvec_aux()
 
         sEvec_ir = nambu.c_to_ir(sE_c)
@@ -73,7 +73,7 @@ class TestGFAuxSC(unittest.TestCase):
         """ """
         #pass
         fin_sE_to = os.path.join(currentdir, "files/self_moy_sc_b60tp04n0495U6500.dat")
-        gf_aux = auxfn_sc.GFAuxSC(fin_sE_to=fin_sE_to, rm_sE_ifty=False)
+        gf_aux = auxfnsc.GFAuxSC(fin_sE_to=fin_sE_to, rm_sE_ifty=False)
         gf_aux.build_gfvec_aux()
         
         gf_aux.ac(fin_OME_default=os.path.join(currentdir, "files/OME_default.dat"), \
