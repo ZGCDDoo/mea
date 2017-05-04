@@ -9,7 +9,7 @@ import numpy as np
 import unittest
 
 import os
-from mea import acon
+from .. import acon
 
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")

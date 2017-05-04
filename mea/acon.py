@@ -12,7 +12,7 @@ import warnings
 import shutil
 from copy import deepcopy
 
-from mea.tools import fmanip
+from .tools import fmanip
 
 
 
@@ -159,10 +159,10 @@ class ACon():
             gf_tmp = np.conjugate(gf_t[:, nums[-1]]) if to_conjugate_list[-1] else gf_t[:, nums[-1]].copy()
             gf_aux_t[:, l] += 2.0/N * sgn* gf_tmp
 
-        delta = 10**(-3.0)
-        self.gf_aux_t = gf_aux_t.copy() #* (1.0 + delta * np.random.uniform(-1.0, 1.0, gf_aux_t.size).reshape(gf_aux_t.shape) )
-        self.gf_aux_error_t = np.absolute(gf_aux_t.real * delta) + \
-                           1.0j*np.absolute(gf_aux_t.imag * delta)
+        #delta = 0.0#10**(-3.0)
+        #cst_err = delta * gf_aux_t[0, 0].imag * np.random.choice([-1.0, 1.0], size=gf_aux_t.shape)
+        self.gf_aux_t = gf_aux_t.copy() #* (1.0 + cst_err)
+        #self.gf_aux_error_t = np.absolute(cst_err) * (1.0 + 1.0j)
 
         # save the gf_aux_t_acon.dat in a file
         tmp = np.zeros((self.gf_aux_t.shape[0], 2*self.gf_aux_t.shape[1] + 1))
@@ -221,7 +221,7 @@ class ACon():
 
                 self.acon_preprocess()
                 np.savetxt(self.tmp_file, np.array([self.zn_vec, gf.real, gf.imag]).T)
-                np.savetxt(self.tmp_file_error, np.array([self.zn_vec, self.gf_aux_error_t[:, j].real, self.gf_aux_error_t[:, j].imag]).T)
+                #np.savetxt(self.tmp_file_error, np.array([self.zn_vec, self.gf_aux_error_t[:, j].real, self.gf_aux_error_t[:, j].imag]).T)
                 assert os.path.isfile(self.tmp_file), "ayaya, tmp_green.dat does not exist"
 
                 # 3.1) Modify the elements in the input_file and call OmegaMaxEnt
@@ -306,7 +306,7 @@ class ACon():
             # 3.1) Modify the elements in the input_file
             OME_input_s = OME_input.read()
             OME_input_s = re.sub(r"data file:", "data file:" + self.tmp_file, OME_input_s)
-            #OME_input_s = re.sub(r"error file:", "error file:" + self.tmp_file_error, OME_input_s)
+            OME_input_s = re.sub(r"error file:", "error file:" + self.tmp_file_error, OME_input_s)
 
             for line in self.OME_input[iter_OME_input]:
                 line_strip = line.rstrip()

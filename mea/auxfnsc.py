@@ -22,10 +22,10 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 sys.path.insert(0, currentdir)
 
-from mea import auxfn
-from mea.tools import kramerskronig as kk
-from mea import acon 
-from mea.model import green, nambu
+from . import auxfn
+from .tools import kramerskronig as kk
+from . import acon 
+from .model import green, nambu
 
 
 # Notations:

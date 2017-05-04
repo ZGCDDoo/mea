@@ -8,7 +8,7 @@ import numpy as np
 import os
 import unittest
 
-from mea.model import nambu
+from ..model import nambu
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")
 

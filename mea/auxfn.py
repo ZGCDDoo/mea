@@ -9,10 +9,10 @@ import numpy as np
 from scipy import linalg
 from copy import deepcopy
 import os
-from mea.tools import fmanip
-from mea.tools import kramerskronig as kk
-from mea.model import green
-from mea import acon
+from .tools import fmanip
+from .tools import kramerskronig as kk
+from .model import green
+from . import acon
 
 
 

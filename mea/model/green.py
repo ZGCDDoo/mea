@@ -7,7 +7,7 @@ To lighten the writing we supress the "vec". Maybe consider putting everything a
 """
 
 import numpy as np
-from scipy import linalg
+
 
 
 def read_green_c(fin_gf_to, zn_col=0):

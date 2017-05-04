@@ -9,9 +9,9 @@ import os
 import unittest
 from scipy import linalg
 
-from mea import auxfn
-from mea.model import green
-from mea.tests import test_tools
+from .. import auxfn
+from ..model import green
+from . import test_tools
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")
    

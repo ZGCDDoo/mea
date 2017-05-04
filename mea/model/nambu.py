@@ -11,8 +11,7 @@ sys.path.insert(0, parentdir)
 sys.path.insert(0, currentdir)
 
 import numpy as np
-from scipy import linalg
-import green
+from . import green
 
 def read_nambu_c(fin_nambu_to, zn_col=0):
     """Reads the cluster nambu in a tabular-out form in the cluster

@@ -2,7 +2,7 @@ from numba import jitclass, jit, double, complex128
 import numpy as np
 from scipy import linalg
 from scipy.integrate import dblquad
-import periodize
+from . import periodize
 
 
 

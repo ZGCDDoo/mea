@@ -10,9 +10,9 @@ import unittest
 from scipy import linalg
 
 
-from mea import  auxfnsc, auxfn
-from mea.model import nambu
-from mea.tests import test_tools
+from .. import  auxfnsc, auxfn
+from ..model import nambu
+from . import test_tools
 
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")

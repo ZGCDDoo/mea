@@ -1,7 +1,6 @@
 #calc_dos_fermi.py
 
-import green
-import periodize
+from ..model import green, periodize
 import sys, os
 import json
 

@@ -1,7 +1,7 @@
 import numpy as np # type: ignore
-import periodize  # type: ignore
+from mea.model import green, periodize  # type: ignore
 import scipy.integrate as sI # type: ignore
-import green # type: ignore
+
 
 
 class SigmaDC:
@@ -13,7 +13,7 @@ class SigmaDC:
         self.sEvec_c = sEvec_c
         self.beta = beta
         self.mu = mu 
-        self.prefactor = 1.0/beta
+        self.prefactor = -2.0
         self.t = 1.0
         self.tp = 0.4
         return None
@@ -53,7 +53,7 @@ class SigmaDC:
         sigma_dc = sI.simps(integrand_w, self.wvec)
 
         # Finalement, multiplication par toutes les constantes: mesures d'integration, etc.
-        sigma_dc *= -1.0/(2.0*np.pi)**(3.0)*self.prefactor*self.vz2_integrated()
+        sigma_dc *= 1.0/(2.0*np.pi)**(3.0)*self.prefactor*self.vz2_integrated()
 
         print("sigma_dc = ", sigma_dc)
         with open("sigmadc.dat", mode="a") as fout:

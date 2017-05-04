@@ -11,8 +11,8 @@ from scipy import linalg
 from random import random
 
 
-from mea.tests import test_tools
-from mea.model import periodize, green 
+from . import test_tools
+from ..model import periodize, green 
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")
 

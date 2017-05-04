@@ -12,7 +12,7 @@ To lighten the writing we supress the "vec". The same goes for the sE.
 import numpy as np
 import os
 import unittest
-from mea.model import green
+from ..model import green
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")
 
