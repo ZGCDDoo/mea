@@ -24,7 +24,7 @@ with open("statsparams0.json") as fin:
     beta = params["beta"][0]
 
 
-gf_aux = auxfn.GFAux(fin_sE_to=os.path.join(cwd, "self_moy.dat"), mu=mu)
+gf_aux = auxfn.GFAux(fin_sE_to=os.path.join(cwd, "self_moy.dat"), mu=mu, delta=0.001)
 gf_aux.ac(fin_OME_default=os.path.join(cwd, "OME_default.dat"), fin_OME_input=os.path.join(cwd, "OME_input.dat"))
 gf_aux.get_sEvec_w_list()
 

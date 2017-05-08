@@ -1,19 +1,10 @@
-from numba import jitclass, jit, double, complex128 # type: ignore
 import numpy as np # type: ignore
-from ..model import periodize_class as perc  # type: ignore
+from mea.model import green, periodize  # type: ignore
 import scipy.integrate as sI # type: ignore
 import theano # type: ignore
+#from numba import jitclass
 
 
-spec = [
-    ('wvec', double[:]),
-    ('sEvec_c', complex128[:,:]),
-    ('beta', double),
-    ('mu', double)
-    ]
-
-
-#@jitclass(spec)
 class SigmaDC:
 
     def __init__(self, wvec, sEvec_c, beta: float, mu: float) -> None:
@@ -26,9 +17,6 @@ class SigmaDC:
         self.prefactor = -2.0 #sum on spins,  weistrass-th, v_kz integrated 
         self.t = 1.0
         self.tp = 0.4
-
-        self.model = perc.Model(self.t, self.tp, mu, wvec, sEvec_c)
-
         return None
 
 
@@ -46,26 +34,22 @@ class SigmaDC:
         return result
 
     
-    def y1(self, x: float) -> float:
-        return -np.pi
-    
-    def y2(self, x: float) -> float:
-        return np.pi
-
     def calc_sigmadc(self) -> float:
         """ """
         sigma_dc: float  = 0.0
-        Akw2 = self.model.periodize_Akw2
+        Akw2 = periodize.periodize_Akw2
+        y1 = periodize.Y1Limit
+        y2 = periodize.Y2Limit
 
         integrand_w = np.zeros(self.wvec.shape)
         for (i, ww) in enumerate(self.wvec):
-            integrand_w[i] = 1.0/(2.0*np.pi)**(2.0)*sI.dblquad(Akw2, -np.pi, np.pi, self.y1, self.y2, epsabs=1e-8,
-                                                               args=([i]) )[0]
+            integrand_w[i] = 1.0/(2.0*np.pi)**(2.0)*sI.dblquad(Akw2, -np.pi, np.pi, y1, y2, epsabs=1e-8,
+                                        args=(self.t, self.tp, self.sEvec_c[i], ww, self.mu) )[0]
             integrand_w[i] *= self.dfd_dw(ww)
             
         sigma_dc = 1.0/(2.0*np.pi)*sI.simps(integrand_w, self.wvec)
 
-        
+        # Finalement, multiplication par toutes les constantes: mesures d'integration, etc.
         sigma_dc *= self.prefactor
 
         print("sigma_dc = ", sigma_dc)
@@ -92,6 +76,23 @@ class SigmaDC:
 
         return sigma_dc
 
+if __name__ == "__main__":
+
+    import os, json
 
 
+    with open("statsparams.json") as fin:
+        params = json.load(fin)
+        mu = params["mu"][0]
+        beta = params["beta"][0]
+    
+    for i in range(10):
+        
+        fname: str = "self_ctow" + str(i) + ".dat"
+        if not os.path.isfile(fname):
+            break
+
+        (wvec, sEvec_c) = green.read_green_c(fname)
+        SDC = SigmaDC(wvec, sEvec_c, beta=beta, mu=mu)
+        SDC.calc_sigmadc()
 

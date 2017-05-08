@@ -26,7 +26,8 @@ class GFAux():
 
     def __init__(self, zn_col=0, mu=0.0, fin_sE_to="self_moy.dat", 
                  fout_sE_ctow="self_ctow.dat", fout_gf_aux_to="gf_aux_to.dat", 
-                 fout_log=fout_log, rm_sE_ifty=False, loc=None, non_loc=None):
+                 fout_log=fout_log, rm_sE_ifty=False, loc=None, non_loc=None,
+                 non_loc_sign=None, non_loc_to_conjugate=None, delta=0.0):
         """Initialize the GFAux object. The notation '_c' is used for a matrix cluster 
         representation, '_t' for a tabular form (in complex number and without the 
         matsubara grid), '_to' is used for a tabular form (with the matsubara grid
@@ -61,8 +62,11 @@ class GFAux():
         self.fout_gf_aux_to = fout_gf_aux_to
         self.fout_log = fout_log
         self.rm_sE_ifty = rm_sE_ifty
-        self.loc = [0, 1, 2, 3] if loc is None else loc    
-        self.non_loc = [[0, 1, 2, 3, 4]] if non_loc is None else non_loc
+        self.loc = (0, 1, 2, 3) if loc is None else loc    
+        self.non_loc = ((0, 1, 2, 3, 4), ) if non_loc is None else non_loc
+        self.non_loc_sign = ((1, 1, 1, 1, 1), ) if non_loc_sign is None else non_loc_sign
+        self.non_loc_to_conjugate = ((False, False, False, False, False), ) if non_loc_to_conjugate is None else non_loc_to_conjugate
+        self.delta = delta
         # check the sanity of the constructing parameters
         self.check_sanity()
 
@@ -135,7 +139,9 @@ class GFAux():
                   
         self.acon = acon.ACon(gf_aux_irt, self.zn_vec, 
                     fin_OME_default=fin_OME_default, fin_OME_other=fin_OME_other, 
-                    fin_OME_input=fin_OME_input, loc=self.loc, non_loc=self.non_loc)
+                    fin_OME_input=fin_OME_input, loc=self.loc, non_loc=self.non_loc,
+                    non_loc_sign=self.non_loc_sign,
+                    non_loc_to_conjugate=self.non_loc_to_conjugate, delta=self.delta)
         
         # print("IN gf_aux.acon() \n")
         self.acon.acon()

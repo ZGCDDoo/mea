@@ -25,17 +25,18 @@ class ACon():
         with different inputt files for OmegaMaxEnt ('OME_input.dat')."""
 
     # Defaults for AnisotropicTriangularC2v (not SC)
-    loc_default = [0, 1, 2, 3]
-    non_loc_default = [[0, 1, 2, 3, 4]]
-    non_loc_sign_default = [[1, 1, 1, 1, 1]]
-    non_loc_to_conjugate_default = [[False, False, False, False, False]]
+    loc_default = (0, 1, 2, 3)
+    non_loc_default = ((0, 1, 2, 3, 4), )
+    non_loc_sign_default = ((1, 1, 1, 1, 1), )
+    non_loc_to_conjugate_default = ((False, False, False, False, False), )
     fout_log = "log_mea2_0.dat"
 
     def __init__(self, gf_t, zn_vec, fout_Aw_t="Aw_t.dat",
                  fin_OME_default="OME_default.dat", fin_OME_other="OME_other.dat",
                  fin_OME_input="OME_input.dat", loc=loc_default,
-                 non_loc=non_loc_default, non_loc_sign=non_loc_sign_default, non_loc_to_conjugate=non_loc_to_conjugate_default, fout_log=fout_log,
-                 NN = None):
+                 non_loc=non_loc_default, non_loc_sign=non_loc_sign_default,
+                 non_loc_to_conjugate=non_loc_to_conjugate_default, fout_log=fout_log,
+                 NN=None, delta=0.0):
         """Initialize the acon object.
 
         Args:
@@ -62,6 +63,7 @@ class ACon():
         self.non_loc_sign = deepcopy(non_loc_sign)
         self.non_loc_to_conjugate = deepcopy(non_loc_to_conjugate)
         self.NN = NN
+        self.delta = delta
 
         self.outdir = "Result_OME" # output directory for the results
         self.tmp_file = "tmp_green.dat"
@@ -87,6 +89,7 @@ class ACon():
         self.w_vec_list = []
         self.w_vec_file = "w_n.dat"
         self.gf_aux_t = None
+        self.gf_aux_error_t = None
         self.Aw_aux_t_list = []
         self.Aw_t_list = []
 
@@ -159,17 +162,17 @@ class ACon():
             gf_tmp = np.conjugate(gf_t[:, nums[-1]]) if to_conjugate_list[-1] else gf_t[:, nums[-1]].copy()
             gf_aux_t[:, l] += 2.0/N * sgn* gf_tmp
 
-        #delta = 0.0#10**(-3.0)
-        #cst_err = delta * gf_aux_t[0, 0].imag * np.random.choice([-1.0, 1.0], size=gf_aux_t.shape)
-        self.gf_aux_t = gf_aux_t.copy() #* (1.0 + cst_err)
-        #self.gf_aux_error_t = np.absolute(cst_err) * (1.0 + 1.0j)
+        
+        cst_err = self.delta * gf_aux_t[0, :].imag * np.random.choice([-1.0, 1.0], size=gf_aux_t.shape)
+        self.gf_aux_t = gf_aux_t.copy() * (1.0 + cst_err)
+        self.gf_aux_error_t = np.absolute(cst_err) * (1.0 + 1.0j)
 
-        # save the gf_aux_t_acon.dat in a file
+        # save the gf_aux_to_acon.dat in a file
         tmp = np.zeros((self.gf_aux_t.shape[0], 2*self.gf_aux_t.shape[1] + 1))
         tmp[:, 0] = self.zn_vec.copy()
         tmp[:, 1::2] = self.gf_aux_t.real.copy()
         tmp[:, 2::2] = self.gf_aux_t.imag.copy()
-        fout_gf_aux_t = "gf_aux_t_acon.dat"
+        fout_gf_aux_t = "gf_aux_to_acon.dat"
         
         fmanip.backup_file(fout_gf_aux_t)
         np.savetxt(fout_gf_aux_t, tmp)
@@ -221,7 +224,7 @@ class ACon():
 
                 self.acon_preprocess()
                 np.savetxt(self.tmp_file, np.array([self.zn_vec, gf.real, gf.imag]).T)
-                #np.savetxt(self.tmp_file_error, np.array([self.zn_vec, self.gf_aux_error_t[:, j].real, self.gf_aux_error_t[:, j].imag]).T)
+                np.savetxt(self.tmp_file_error, np.array([self.zn_vec, self.gf_aux_error_t[:, j].real, self.gf_aux_error_t[:, j].imag]).T)
                 assert os.path.isfile(self.tmp_file), "ayaya, tmp_green.dat does not exist"
 
                 # 3.1) Modify the elements in the input_file and call OmegaMaxEnt
@@ -247,7 +250,8 @@ class ACon():
                     if os.path.isdir(folder):
                         shutil.move(folder, os.path.join(cur_write_dir, folder + str(j)) )
     
-                shutil.move(self.tmp_file, self.tmp_file.split(".")[0] + str(j) + "." + self.tmp_file.split(".")[1])                     
+                shutil.move(self.tmp_file, self.tmp_file.split(".")[0] + str(j) + "." + self.tmp_file.split(".")[1])
+                shutil.move(self.tmp_file_error, self.tmp_file_error.split(".")[0] + str(j) + "." + self.tmp_file_error.split(".")[1])                       
             
             Aw_t = None if Aw_aux_t is None else self.build_Aw_t(Aw_aux_t)
             self.Aw_aux_t_list.append(Aw_aux_t)
@@ -306,7 +310,8 @@ class ACon():
             # 3.1) Modify the elements in the input_file
             OME_input_s = OME_input.read()
             OME_input_s = re.sub(r"data file:", "data file:" + self.tmp_file, OME_input_s)
-            OME_input_s = re.sub(r"error file:", "error file:" + self.tmp_file_error, OME_input_s)
+            if not np.isclose(self.delta, 0.0):
+                OME_input_s = re.sub(r"error file:", "error file:" + self.tmp_file_error, OME_input_s)
 
             for line in self.OME_input[iter_OME_input]:
                 line_strip = line.rstrip()

@@ -1,4 +1,3 @@
-
 import periodize_nambu
 import nambu
 import numpy as np
@@ -24,5 +23,7 @@ for (zn, sE) in zip(zn_vec, sEvec_c):
 
 print("\n\n\n lattice stiffness \n\n.")
 print("stiffness = ", stiffness)
+
+np.savetxt("stiffness.dat", np.array([stiffness]))
 
 
