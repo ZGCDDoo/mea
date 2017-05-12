@@ -56,7 +56,7 @@ class SigmaDC:
         integrand_w = np.zeros(self.wvec.shape)
         for (i, ww) in enumerate(self.wvec):
 
-            if abs(self.beta*ww > self.cutoff):
+            if abs(self.beta*ww) > self.cutoff:
                 integrand_w[i] = 0.0
             else:
                 integrand_w[i] = 1.0/(2.0*np.pi)**(2.0)*sI.dblquad(Akw2, -np.pi, np.pi, self.y1, self.y2, epsabs=1e-8,
