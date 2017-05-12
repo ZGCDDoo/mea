@@ -96,7 +96,7 @@ class TestPeriodizeClass(unittest.TestCase):
         except AssertionError:
             self.fail("np all close failed at test_exp_k")  
 
-    @unittest.skip
+    #@unittest.skip
     def test_periodize_Akw(self):
         """ """
 
@@ -105,10 +105,10 @@ class TestPeriodizeClass(unittest.TestCase):
         kx, ky = (0.122, -0.987)
         k = np.array([kx,ky])
         sE = np.random.rand(4, 4)
-        sE = np.array(sE, dtype=complex)
+        sEarr = np.array([sE], dtype=complex)
         ww = random()
         mu = random()
-        model = perc.Model(t, tp, mu, np.array([ww]), sE )
+        model = perc.Model(t, tp, mu, np.array([ww]), sEarr)
         N_c = 4
         r_sites = np.array([[0.0, 0.0], [1.0,0.0], [1.0,1.0], [0.0,1.0]])
         gf_ktilde = linalg.inv((ww + mu)*np.eye(4) - model.t_value(kx, ky) - sE)
@@ -128,16 +128,16 @@ class TestPeriodizeClass(unittest.TestCase):
             self.fail("np all close failed at test_periodize_Akw")         
 
 
-    @unittest.skip
+    #@unittest.skip
     def test_periodize_Gkw(self):
         """ """
         t, tp = (1.0, 0.4)
         kx, ky = (0.122, -0.987)
         sE = np.random.rand(4, 4)
-        sE = np.array(sE, dtype=complex)
+        sEarr = np.array([sE], dtype=complex)
         ww = random()
         mu = random()
-        model = perc.Model(t, tp, mu, np.array([ww]), np.array([sE]))
+        model = perc.Model(t, tp, mu, np.array([ww]), sEarr)
         Akw = model.periodize_Akw(kx, ky, 0)
         Akw_test = -2.0*model.periodize_Gkw_vec(kx, ky).imag
 
@@ -146,7 +146,7 @@ class TestPeriodizeClass(unittest.TestCase):
         except AssertionError:
             self.fail("np all close failed at test_periodize_Gkw")   
 
-    @unittest.skip
+    #@unittest.skip
     def test_fermi_surface(self):
         """ """
         pass
