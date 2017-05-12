@@ -26,7 +26,7 @@ class SigmaDC:
         self.prefactor = -2.0 #sum on spins,  weistrass-th, v_kz integrated 
         self.t = 1.0
         self.tp = 0.4
-
+        self.cutoff = 30  # beta*omega
         self.model = perc.Model(self.t, self.tp, mu, wvec, sEvec_c)
 
         return None
@@ -37,20 +37,16 @@ class SigmaDC:
         # implement fermi function as the exemple of the logistic function
         
         beta: float = self.beta
-        result: float
-        if np.abs(beta*omega) > 50:
-            result = 0.0
-        else:
-            result = -beta * np.exp(beta*omega)/(1.0 + np.exp(beta*omega))**2.0
-        
+        result: float = -beta * np.exp(beta*omega)/(1.0 + np.exp(beta*omega))**2.0
         return result
 
-    
+
     def y1(self, x: float) -> float:
         return -np.pi
     
     def y2(self, x: float) -> float:
         return np.pi
+
 
     def calc_sigmadc(self) -> float:
         """ """
@@ -59,9 +55,13 @@ class SigmaDC:
 
         integrand_w = np.zeros(self.wvec.shape)
         for (i, ww) in enumerate(self.wvec):
-            integrand_w[i] = 1.0/(2.0*np.pi)**(2.0)*sI.dblquad(Akw2, -np.pi, np.pi, self.y1, self.y2, epsabs=1e-8,
+
+            if abs(self.beta*ww > self.cutoff):
+                integrand_w[i] = 0.0
+            else:
+                integrand_w[i] = 1.0/(2.0*np.pi)**(2.0)*sI.dblquad(Akw2, -np.pi, np.pi, self.y1, self.y2, epsabs=1e-8,
                                                                args=([i]) )[0]
-            integrand_w[i] *= self.dfd_dw(ww)
+                integrand_w[i] *= self.dfd_dw(ww)
             
         sigma_dc = 1.0/(2.0*np.pi)*sI.simps(integrand_w, self.wvec)
 
