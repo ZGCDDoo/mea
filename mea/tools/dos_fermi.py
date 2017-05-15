@@ -1,16 +1,18 @@
-#calc_dos_fermi.py
+# calc_dos_fermi.py
 
-from ..model import green, periodize
-import sys, os
+from ..model import green
+from ..model import periodize_class as perc
 import json
 
-fname = str(sys.argv[1])
 
-with open("statsparams.dat") as fin:
-    mu = json.load(fin)["mu"]
+def calc_dos_fermi(fname):
+    """ """
 
-(w_vec, sEvec_cw) = green.read_green_c(fname)
+    with open("statsparams0.json") as fin:
+        mu = json.load(fin)["mu"][0]
 
-model = periodize.Model(1.0, 0.4, mu, w_vec, sEvec_cw)
-periodize.calc_dos(model, "dos_calcdos.dat")
-periodize.fermi_surface(model, 0.0, "fermi_surface.dat")
+    (w_vec, sEvec_cw) = green.read_green_c(fname)
+
+    model = perc.Model(1.0, 0.4, mu, w_vec, sEvec_cw)
+    model.calc_dos("dos_calcdos.dat")
+    #model.fermi_surface(0.0, "fermi_surface.dat")

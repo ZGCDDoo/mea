@@ -42,5 +42,5 @@ def main():
         print("zkweight = ", periodize.zk_weight(model, np.pi, np.pi) )
         fout_fermi = "fermi_surface" + str(i) + ".dat"
         periodize.fermi_surface(model, w_value=0.0, fout=fout_fermi)
-        SDC = sigmadc.SigmaDC(w_vec, sEvec_cw, beta=beta, mu=mu)
-        SDC.calc_sigmadc()
+        sdc = sigmadc.SigmaDC(w_vec, sEvec_cw, beta=beta, mu=mu)
+        sdc.calc_sigmadc()

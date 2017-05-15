@@ -134,7 +134,7 @@ class Model:
         ii: int
         for ii in range(len_sEvec_c):
             #print("IN LOOP of dos # ", n, " out of ", len_sEvec_c, "\n")
-            dos[ii] = (2.0*np.pi)**(-2.0)*dblquad(self.periodize_Akw, -np.pi, np.pi, self.ky1Limit, self.ky2Limit, args=(ii))[0]
+            dos[ii] = (2.0*np.pi)**(-2.0)*dblquad(self.periodize_Akw, -np.pi, np.pi, self.ky1Limit, self.ky2Limit, args=(ii,))[0]
         dos_out = np.transpose([w_vec, dos])
         np.savetxt(fout_name, dos_out)
         return dos
@@ -154,7 +154,7 @@ class Model:
         dos = np.zeros(len_sEvec_c)
         for ii in range(len_sEvec_c):
             #print("IN LOOP of dos # ", n, " out of ", len_sEvec_c, "\n")
-            dos[ii] = (2.0*np.pi)**(-2.0)*dblquad(self.Akw_trace, -np.pi, np.pi, self.ky1Limit, self.ky2Limit, args=(ii))[0]
+            dos[ii] = (2.0*np.pi)**(-2.0)*dblquad(self.Akw_trace, -np.pi, np.pi, self.ky1Limit, self.ky2Limit, args=(ii,))[0]
         dos_out = np.transpose([w_vec, dos])
         np.savetxt(fout_name, dos_out)
         return dos

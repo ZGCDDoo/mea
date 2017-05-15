@@ -121,9 +121,14 @@ class TestPeriodizeClass(unittest.TestCase):
         
         Akw = -2.0*gf_w_lattice.imag
         Akw_test = model.periodize_Akw(kx, ky, 0)
+        Akw2 = (-2.0*gf_w_lattice.imag)**(2.0)
+        Akw2_test = (model.periodize_Akw2(kx, ky ,0))
         
         try:
             test_tools.compare_arrays(Akw, Akw_test)
+            test_tools.compare_arrays(Akw2, Akw2_test)
+            np.testing.assert_allclose(Akw, Akw_test)
+            np.testing.assert_allclose(Akw2, Akw2_test)
         except AssertionError:
             self.fail("np all close failed at test_periodize_Akw")         
 

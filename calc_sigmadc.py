@@ -15,5 +15,5 @@ for i in range(10):
         break
 
     (wvec, sEvec_c) = green.read_green_c(fname)
-    SDC = sigmadc.SigmaDC(wvec, sEvec_c, beta=beta, mu=mu)
-    SDC.calc_sigmadc()
+    sdc = sigmadc.SigmaDC(wvec, sEvec_c, beta=beta, mu=mu)
+    sdc.calc_sigmadc()

@@ -1,19 +1,8 @@
-from numba import jitclass, jit, double, complex128 # type: ignore
 import numpy as np # type: ignore
 from ..model import periodize_class as perc  # type: ignore
 import scipy.integrate as sI # type: ignore
-import theano # type: ignore
 
 
-spec = [
-    ('wvec', double[:]),
-    ('sEvec_c', complex128[:,:]),
-    ('beta', double),
-    ('mu', double)
-    ]
-
-
-#@jitclass(spec)
 class SigmaDC:
 
     def __init__(self, wvec, sEvec_c, beta: float, mu: float) -> None:
