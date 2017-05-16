@@ -5,18 +5,13 @@ import scipy.integrate as sI # type: ignore
 
 class SigmaDC:
 
-    def __init__(self, wvec, sEvec_c, beta: float, mu: float) -> None:
+    def __init__(self, model, beta: float) -> None:
         """ """
 
-        self.wvec = wvec
-        self.sEvec_c = sEvec_c
         self.beta = beta
-        self.mu = mu 
         self.prefactor = -2.0 #sum on spins,  weistrass-th, v_kz integrated 
-        self.t = 1.0
-        self.tp = 0.4
         self.cutoff = 30  # beta*omega
-        self.model = perc.Model(self.t, self.tp, mu, wvec, sEvec_c)
+        self.model = model
 
         return None
 
@@ -42,19 +37,17 @@ class SigmaDC:
         sigma_dc: float  = 0.0
         Akw2 = self.model.periodize_Akw2
 
-        integrand_w = np.zeros(self.wvec.shape)
-        for (i, ww) in enumerate(self.wvec):
+        integrand_w = np.zeros(self.model.w_vec.shape)
+        for (i, ww) in enumerate(self.model.w_vec):
 
             if abs(self.beta*ww) > self.cutoff:
                 integrand_w[i] = 0.0
             else:
                 integrand_w[i] = 1.0/(2.0*np.pi)**(2.0)*sI.dblquad(Akw2, -np.pi, np.pi, self.y1, self.y2, epsabs=1e-8,
-                                                               args=([i]) )[0]
+                                                                   args=(i,) )[0]
                 integrand_w[i] *= self.dfd_dw(ww)
             
-        sigma_dc = 1.0/(2.0*np.pi)*sI.simps(integrand_w, self.wvec)
-
-        
+        sigma_dc = 1.0/(2.0*np.pi)*sI.simps(integrand_w, self.model.w_vec)
         sigma_dc *= self.prefactor
 
         print("sigma_dc = ", sigma_dc)

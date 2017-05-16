@@ -1,3 +1,4 @@
+from mea.model import periodize_class as perc
 from mea.model import green
 from mea.transport import sigmadc
 import os, json
@@ -13,7 +14,8 @@ for i in range(10):
     fname: str = "self_ctow" + str(i) + ".dat"
     if not os.path.isfile(fname):
         break
-
+    
     (wvec, sEvec_c) = green.read_green_c(fname)
-    sdc = sigmadc.SigmaDC(wvec, sEvec_c, beta=beta, mu=mu)
+    model = perc.Model(1.0, 0.4 , mu, wvec, sEvec_c)
+    sdc = sigmadc.SigmaDC(model, beta=beta)
     sdc.calc_sigmadc()

@@ -9,6 +9,7 @@ import os
 import unittest
 
 from ..model import green
+from ..model import periodize_class as perc
 from ..transport import sigmadc  
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")
@@ -29,30 +30,39 @@ class TestSigmaDC(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         print("\nIn test_sigmadc.\n")
-        fin_gf_to = os.path.join(currentdir, "files/self_moy.dat")
-        beta = 21.3
+        fin_gf_to = os.path.join(currentdir, "files/self_ctow0_U6.25n0495b12.dat")
+        beta = 12.0
         (w_vec, sEvec_c) = green.read_green_c(fin_gf_to, zn_col=0)
-        mu = 1.123
-        cls.sdc = sigmadc.SigmaDC(w_vec, sEvec_c, beta, mu)
+        mu = 3.1736422868580827
+        model = perc.Model(1.0, 0.4, mu, w_vec, sEvec_c)
+        cls.sdc = sigmadc.SigmaDC(model, beta)
 
 
 
     def test_init(self):
         """ """
         sdc = self.sdc
+        model = self.sdc.model
 
-        self.assertAlmostEqual(sdc.t, 1.0)
-        self.assertAlmostEqual(sdc.tp, 0.4)
-        self.assertAlmostEqual(sdc.mu, 1.123)
+        self.assertAlmostEqual(model.t, 1.0)
+        self.assertAlmostEqual(model.tp, 0.4)
+        self.assertAlmostEqual(model.mu, 3.1736422868580827)
         self.assertAlmostEqual(sdc.prefactor, -2.0)
+        self.assertAlmostEqual(sdc.beta, 12.0)
 
     
     def test_dfd_dw(self):
         """ """
 
         sdc = self.sdc
-        self.assertAlmostEqual(sdc.dfd_dw(0.2), -0.292486, 5)
-        self.assertAlmostEqual(sdc.dfd_dw(-0.1), -2.02208, 5)                     
+        self.assertAlmostEqual(sdc.dfd_dw(0.2), -0.91506 , 5)
+        self.assertAlmostEqual(sdc.dfd_dw(-0.1), -2.13473, 5)
+
+
+    def test_calc_sigmadc(self):
+        """ """
+        self.sdc.cutoff = 8.0
+        self.assertAlmostEqual(self.sdc.calc_sigmadc(), 0.761333, 3)              
 
 
 if __name__ == "__main__":

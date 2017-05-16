@@ -1,10 +1,10 @@
-import os, sys, inspect
+import os
 import numpy as np
-import scipy.integrate
 import json
 
 from . import auxfn
-from .model import green, periodize
+from .model import green
+from .model import periodize_class as perc
 from .transport import sigmadc
 from scipy.integrate import simps
 
@@ -30,17 +30,17 @@ def main():
 
     for (i, (sEvec_cw, w_vec)) in enumerate(zip(sEvec_cw_list, w_vec_list)):
 
-        model = periodize.Model(1.0, 0.4, mu, w_vec, sEvec_cw)
+        model = perc.Model(1.0, 0.4, mu, w_vec, sEvec_cw)
         fout_name = "dos" + str(i) + ".dat"
         fout_name_dos_trace = "dos_trace" + str(i) + ".txt"
-        dos = periodize.calc_dos(model, fout_name)
-        dos_trace = periodize.calc_dos_with_trace(model, fout_name_dos_trace)
+        dos = model.calc_dos(fout_name)
+        dos_trace = model.calc_dos_with_trace(fout_name_dos_trace)
         dos_fct = np.loadtxt(fout_name)
         dos_trace = np.loadtxt(fout_name_dos_trace)
         print("dos normalisation = ", simps(dos_fct[:, 1], dos_fct[:, 0])/(2.0*np.pi))
         print("dos_trace normalisation = ", simps(dos_trace[:, 1], dos_trace[:, 0])/(2.0*np.pi))
-        print("zkweight = ", periodize.zk_weight(model, np.pi, np.pi) )
+        print("zkweight = ", model.zk_weight(np.pi, np.pi) )
         fout_fermi = "fermi_surface" + str(i) + ".dat"
-        periodize.fermi_surface(model, w_value=0.0, fout=fout_fermi)
-        sdc = sigmadc.SigmaDC(w_vec, sEvec_cw, beta=beta, mu=mu)
+        #periodize.fermi_surface(model, w_value=0.0, fout=fout_fermi)
+        sdc = sigmadc.SigmaDC(model, beta=beta)
         sdc.calc_sigmadc()

@@ -191,30 +191,30 @@ class Model:
         return (sE_lattice_vec)
 
 
-def zk_weight(self, kx: float, ky: float) -> Tuple[float, float]:
-    """ """
-    t = self.t; tp = self.tp; sEvec_c = self.sEvec_c; w_vec = self.w_vec; mu = self.mu
-    sEvec_w = self.build_sE_lattice_vec(self, kx, ky)
-    np.savetxt("sEw_Periodized.dat", np.transpose([w_vec, sEvec_w.real, sEvec_w.imag]))
-    w0: float = self.eps_0(kx, ky) - mu
-    indicesgreater = np.where(w_vec > w0)[0]
-    indicesless = np.where(w_vec < w0)[0]
-    grid1 = np.array([indicesless[-1], indicesgreater[0], indicesgreater[1]])
-    grid2 = np.array([indicesless[-2], indicesless[-1], indicesgreater[0]])
-    fct1 = sEvec_w[grid1].real.copy()
-    fct2 = sEvec_w[grid2].real.copy()
-    coefs1 = np.polyfit(grid1, fct1, 2)
-    coefs2 = np.polyfit(grid2, fct2, 2)
-    #print("grid1 = ", grid1)
-    #print("grid2 = ", grid2)
-    #print("coefs1 = ", coefs1)
-    #print("coefs2 = ", coefs2)
-    #print("w0 = ", w0)
-    derivative1 = 2.0*w0*coefs1[0] + coefs1[1]
-    derivative2 = 2.0*w0*coefs2[0] + coefs2[1]
-    zk1: float = 1.0/(1.0 - derivative1)
-    zk2: float = 1.0/(1.0 - derivative2)
-    return ((zk1, zk2))
+    def zk_weight(self, kx: float, ky: float) -> Tuple[float, float]:
+        """ """
+        t = self.t; tp = self.tp; sEvec_c = self.sEvec_c; w_vec = self.w_vec; mu = self.mu
+        sEvec_w = self.build_sE_lattice_vec(kx, ky)
+        np.savetxt("sEw_Periodized.dat", np.transpose([w_vec, sEvec_w.real, sEvec_w.imag]))
+        w0: float = self.eps_0(kx, ky) - mu
+        indicesgreater = np.where(w_vec > w0)[0]
+        indicesless = np.where(w_vec < w0)[0]
+        grid1 = np.array([indicesless[-1], indicesgreater[0], indicesgreater[1]])
+        grid2 = np.array([indicesless[-2], indicesless[-1], indicesgreater[0]])
+        fct1 = sEvec_w[grid1].real.copy()
+        fct2 = sEvec_w[grid2].real.copy()
+        coefs1 = np.polyfit(grid1, fct1, 2)
+        coefs2 = np.polyfit(grid2, fct2, 2)
+        #print("grid1 = ", grid1)
+        #print("grid2 = ", grid2)
+        #print("coefs1 = ", coefs1)
+        #print("coefs2 = ", coefs2)
+        #print("w0 = ", w0)
+        derivative1 = 2.0*w0*coefs1[0] + coefs1[1]
+        derivative2 = 2.0*w0*coefs2[0] + coefs2[1]
+        zk1: float = 1.0/(1.0 - derivative1)
+        zk2: float = 1.0/(1.0 - derivative2)
+        return ((zk1, zk2))
 
 
     def fermi_surface(self, w_value, fout="fermi_surface.dat"):
