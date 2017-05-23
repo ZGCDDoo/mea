@@ -4,7 +4,7 @@ import os
 
 from mea import auxfn
 from mea.model import green
-from mea.model import periodize_class as perc
+from mea.model import periodize
 from mea.transport import sigmadc
 from scipy.integrate import simps
 
@@ -28,7 +28,7 @@ w_vec_list = gf_aux.w_vec_list
 
 for (i, (sEvec_cw, w_vec)) in enumerate(zip(sEvec_cw_list, w_vec_list)):
 
-    model = perc.Model(1.0, 0.4, mu, w_vec, sEvec_cw)
+    model = periodize.Model(1.0, 0.4, mu, w_vec, sEvec_cw)
     fout_name = "dos" + str(i) + ".dat"
     fout_name_dos_trace = "dos_trace" + str(i) + ".txt"
     dos = model.calc_dos(fout_name)

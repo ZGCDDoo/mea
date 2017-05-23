@@ -4,7 +4,7 @@ import json
 
 from . import auxfn
 from .model import green
-from .model import periodize_class as perc
+from .model import periodize
 from .transport import sigmadc
 from scipy.integrate import simps
 
@@ -30,7 +30,7 @@ def main():
 
     for (i, (sEvec_cw, w_vec)) in enumerate(zip(sEvec_cw_list, w_vec_list)):
 
-        model = perc.Model(1.0, 0.4, mu, w_vec, sEvec_cw)
+        model = periodize.Model(1.0, 0.4, mu, w_vec, sEvec_cw)
         fout_name = "dos" + str(i) + ".dat"
         fout_name_dos_trace = "dos_trace" + str(i) + ".txt"
         dos = model.calc_dos(fout_name)

@@ -9,7 +9,7 @@ import os
 import unittest
 
 from ..model import green
-from ..model import periodize_class as perc
+from ..model import periodize
 from ..transport import sigmadc  
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")
@@ -34,7 +34,7 @@ class TestSigmaDC(unittest.TestCase):
         beta = 12.0
         (w_vec, sEvec_c) = green.read_green_c(fin_gf_to, zn_col=0)
         mu = 3.1736422868580827
-        model = perc.Model(1.0, 0.4, mu, w_vec, sEvec_c)
+        model = periodize.Model(1.0, 0.4, mu, w_vec, sEvec_c)
         cls.sdc = sigmadc.SigmaDC(model, beta)
 
 

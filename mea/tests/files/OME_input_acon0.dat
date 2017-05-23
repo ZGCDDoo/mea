@@ -6,3 +6,4 @@ show alpha dependant curves ([yes]/no):no
 truncation frequency:20
 maximum moment:
 display preprocessing figures (yes/[no]):no
+real frequency grid file:mea/tests/files/Aw_test_acon0.dat

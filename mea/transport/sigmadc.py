@@ -1,5 +1,5 @@
 import numpy as np # type: ignore
-from ..model import periodize_class as perc  # type: ignore
+from ..model import periodize # type: ignore
 import scipy.integrate as sI # type: ignore
 
 
@@ -37,8 +37,8 @@ class SigmaDC:
         sigma_dc: float  = 0.0
         Akw2 = self.model.periodize_Akw2
 
-        integrand_w = np.zeros(self.model.w_vec.shape)
-        for (i, ww) in enumerate(self.model.w_vec):
+        integrand_w = np.zeros(self.model.z_vec.shape)
+        for (i, ww) in enumerate(self.model.z_vec):
 
             if abs(self.beta*ww) > self.cutoff:
                 integrand_w[i] = 0.0
@@ -47,7 +47,7 @@ class SigmaDC:
                                                                    args=(i,) )[0]
                 integrand_w[i] *= self.dfd_dw(ww)
             
-        sigma_dc = 1.0/(2.0*np.pi)*sI.simps(integrand_w, self.model.w_vec)
+        sigma_dc = 1.0/(2.0*np.pi)*sI.simps(integrand_w, self.model.z_vec)
         sigma_dc *= self.prefactor
 
         print("sigma_dc = ", sigma_dc)

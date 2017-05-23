@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-
-"""
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
 Here every gf is a gfvec, i.e every green-function is a vector of green function.
 To lighten the writing we supress the "vec". The same goes for the sE.
 """
