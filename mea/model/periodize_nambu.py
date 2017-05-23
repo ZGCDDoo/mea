@@ -58,12 +58,12 @@ class ModelNambu:
 
 
     
-    def Y1Limit(x):
+    def Y1Limit(self, x: float) -> float:
         return -np.pi
 
 
     
-    def Y2Limit(x):
+    def Y2Limit(self, x: float) -> float:
         return np.pi        
 
 
@@ -88,9 +88,9 @@ class ModelNambu:
 
 
 
-    def periodize_nambu(self, kx: float, ky: float): # Green periodization
+    def periodize_nambu(self, kx: float, ky: float, ii: int): # Green periodization
         """ """
-        nambu_ktilde = self.build_gf_ktilde(kx, ky)
+        nambu_ktilde = self.build_gf_ktilde(kx, ky, ii)
         ex = np.exp(1.0j*kx)
         ey = np.exp(1.0j*ky)
         v = np.array([1., ex, ex*ey, ey], dtype=complex)
@@ -110,9 +110,9 @@ class ModelNambu:
         return nambu_periodized
 
 
-    def stiffness(self, kx: float, ky: float) -> float:
+    def stiffness(self, kx: float, ky: float, ii: int) -> float:
         """ """
-        nambu_periodized = self.periodize_nambu(kx, ky)
+        nambu_periodized = self.periodize_nambu(kx, ky, ii)
         #coskx: float = np.cos(kx) 
         #cosky: float = np.cos(ky)
         #tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0

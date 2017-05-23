@@ -17,7 +17,7 @@ from . import test_tools
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")
 
-#@unittest.skip("Skipping TestGFAuxSC because conventions in README.txt are not yet implemented.")
+@unittest.skip("Skipping TestGFAuxSC because I need to recode it as self-anormal in d-wave is real!!.")
 class TestGFAuxSC(unittest.TestCase):
     """ A class that implements tests for the Auxiliary green function class. If input is given 
         as a sE file of a cluster, then it builds an auxiliary GF (it can do so

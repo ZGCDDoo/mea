@@ -77,6 +77,8 @@ def t_to_c(z_n, nambu_t):
 
     gf_normal_up = green.t_to_c(z_n, nambu_t[:, :-1])
     gf_normal_down = np.conjugate(gf_normal_up.copy())
+
+    nambu_t[:, -1] = nambu_t[:, -1].real.copy() #for d-wave the anomalous self-energy is real, thus discard the imaginary part
     gf_gorkov[:, 0, 1] = nambu_t[:, -1] ; gf_gorkov[:, 0, 3] = -nambu_t[:, -1] 
     gf_gorkov[:, 1, 0] = np.conjugate(nambu_t[:, -1]) ; gf_gorkov[:, 1, 2] = -np.conjugate(nambu_t[:, -1])
     gf_gorkov[:, 2, 1] = -nambu_t[:, -1] ; gf_gorkov[:, 2 , 3] = nambu_t[:, -1]
@@ -113,6 +115,7 @@ def to_to_c(z_n, nambu_to):
     
     gf_normal_down = np.conjugate(gf_normal_up)
 
+    nambu_t[:, -1] = nambu_t[:, -1].real.copy() #for d-wave the anomalous self-energy is real, thus discard the imaginary part
     gf_gorkov[:, 0, 1] = nambu_t[:, -1] ; gf_gorkov[:, 0, 3] = -nambu_t[:, -1]
     gf_gorkov[:, 1, 0] = np.conjugate(nambu_t[:, -1]) ; gf_gorkov[:, 1, 2] = -np.conjugate(nambu_t[:, -1])
     gf_gorkov[:, 2, 1 ] = -nambu_t[:, -1] ; gf_gorkov[:, 2, 3] = nambu_t[:, -1]
@@ -229,6 +232,8 @@ def to_to_ir(z_n, nambu_to):
     gf_normal_up[:, 2, 2] = nambu_t[:, 2] ;  gf_normal_up[:, 3, 3] = nambu_t[:, 3]
 
     gf_normal_down = np.conjugate(gf_normal_up)
+
+    nambu_t[:, -1] = nambu_t[:, -1].real.copy() #for d-wave the anomalous self-energy is real, thus discard the imaginary part
     gf_gorkov[:, 2, 3] = nambu_t[:, -1]
     gf_gorkov[:, 3, 2] = np.conjugate(nambu_t[:, -1])
 
@@ -255,6 +260,7 @@ def t_to_ir(z_n, nambu_t):
     gf_normal_down = np.conjugate(gf_normal_up)
 
     gf_gorkov = np.zeros((z_n.shape[0], 4, 4), dtype=complex)
+    nambu_t[:, -1] = nambu_t[:, -1].real.copy() #for d-wave the anomalous self-energy is real, thus discard the imaginary part
     gf_gorkov[:, 2, 3] = nambu_t[:, -1]
     gf_gorkov[:, 3, 2] = np.conjugate(nambu_t[:, -1])
 

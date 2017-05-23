@@ -96,7 +96,7 @@ class TestPeriodizeClass(unittest.TestCase):
         except AssertionError:
             self.fail("np all close failed at test_exp_k")  
 
-    #@unittest.skip
+
     def test_periodize_Akw(self):
         """ """
 
@@ -133,7 +133,7 @@ class TestPeriodizeClass(unittest.TestCase):
             self.fail("np all close failed at test_periodize_Akw")         
 
 
-    #@unittest.skip
+
     def test_periodize_Gkz(self):
         """ """
         t, tp = (1.0, 0.4)
@@ -151,7 +151,8 @@ class TestPeriodizeClass(unittest.TestCase):
         except AssertionError:
             self.fail("np all close failed at test_periodize_Gkw")   
 
-    #@unittest.skip
+
+    @unittest.skip("Not testing test_fermi_surface for now.")
     def test_fermi_surface(self):
         """ """
         pass

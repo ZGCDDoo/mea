@@ -16,8 +16,6 @@ currentdir = os.path.join(os.getcwd(), "mea/tests")
 
 
 
-
-#@unittest.skip("Still implementing TestSigmaDC")
 class TestSigmaDC(unittest.TestCase):
     """ A class that implements tests for the Auxiliary green function class. If input is given 
         as a gf file of a cluster, then it builds an auxiliary GF (it can do so

@@ -44,7 +44,9 @@ class TestNambu(unittest.TestCase):
                            -7.366408343079924315e-01 + 1.0j*2.657390136452241966e-02, 1.143356666666668575e+00 + 1.0j*4.120808362573097905e-01,
                             9.995260448343090687e-01 +1.0j*5.800627680311893908e-01, 7.128331949317741056e-01 +1.0j*(-5.551320097465884534e-02)]
                             ])
-                                  
+
+        gf_t[:, -1] = gf_t[:, -1].real.copy() # the anomalous green function should be real. the imaginary part is noise.     
+        
         gf_c_test = nambu.t_to_c(z_n, gf_t)
         gf_t_test = nambu.c_to_t(z_n, gf_c_test)
       
