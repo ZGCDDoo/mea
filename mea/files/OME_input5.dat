@@ -4,6 +4,5 @@ show lowest alpha figures ([yes]/no):no
 show alpha dependant curves ([yes]/no):no
 display preprocessing figures (yes/[no]):no
 real frequency grid origin:0
-maximum moment:0
 use parameterized real frequency grid (yes/[no]):yes
 grid parameters (w_0 dw_0 w_1 dw_1 ... w_{N-1} dw_{N-1} w_N):-50 0.4 -20 0.3 -15 0.1 -10 0.05 -5 0.02 5 0.05 10 0.1 15 0.3 20 0.4 50

@@ -5,4 +5,3 @@ show alpha dependant curves ([yes]/no):no
 display preprocessing figures (yes/[no]):no
 real frequency grid origin:0
 real frequency step:0.02
-default model half width (default: standard deviation):10

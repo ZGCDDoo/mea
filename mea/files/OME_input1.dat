@@ -5,3 +5,5 @@ show alpha dependant curves ([yes]/no):no
 display preprocessing figures (yes/[no]):no
 real frequency grid origin:0
 real frequency step:0.02
+truncation frequency:15
+maximum moment:0

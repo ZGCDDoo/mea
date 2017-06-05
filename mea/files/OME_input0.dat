@@ -3,3 +3,6 @@ show optimal alpha figures ([yes]/no):no
 show lowest alpha figures ([yes]/no):no
 show alpha dependant curves ([yes]/no):no
 display preprocessing figures (yes/[no]):no
+truncation frequency:15
+real frequency step:0.02
+real frequency grid origin:0

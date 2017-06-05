@@ -252,8 +252,8 @@ def ir_to_t(z_n, nambu_ir):
     np.testing.assert_allclose(nambu_t, to_to_t(nambu_to))
     return nambu_t
 
-def t_to_ir(z_n, nambu_t):
-    """ """
+def t_to_ir(z_n, nambu_t, is_ww=False):
+    """if on real axis, then the down part of the nambu spinor needs to have the frequency grid flipped."""
     z_n = z_n.copy();  nambu_t = nambu_t.copy()
     assert(z_n.shape[0] == nambu_t.shape[0])
     gf_normal_up = green.t_to_ir(z_n, nambu_t[:, :-1:])
@@ -268,6 +268,12 @@ def t_to_ir(z_n, nambu_t):
     tmp2 = np.concatenate((gf_gorkov, -gf_normal_down), axis=1)
     nambu_ir = np.concatenate((tmp1, tmp2), axis=2)
 
+    return nambu_ir
+
+def t_to_irw(z_n, namb_t):
+    """tabular to irreducible form in the real frequency axis."""
+    nambu_ir = t_to_ir(z_n, namb_t)
+    nambu_ir[::, 4::, 4::] = np.conjugate(nambu_ir.copy()[::-1, 4::, 4::])
     return nambu_ir
 
 

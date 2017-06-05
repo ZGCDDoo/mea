@@ -4,3 +4,5 @@ show lowest alpha figures ([yes]/no):no
 show alpha dependant curves ([yes]/no):no
 display preprocessing figures (yes/[no]):no
 maximum moment:0
+real frequency grid origin:0
+real frequency step:0.02
