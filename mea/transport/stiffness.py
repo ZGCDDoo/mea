@@ -14,6 +14,7 @@ def stiffness(fname):
     mu = params["mu"][0]
     beta = params["beta"][0]
     tp = params["tp"][0]
+    U = params["U"][0]
     stiffness = 0.0
     stiffness_cum = 0.0
 
@@ -30,6 +31,7 @@ def stiffness(fname):
     print("stiffness = ", stiffness)
     print("\nstiffness_cum = ", stiffness_cum)
     fmanip.backup_file("stiffness.dat")
-    np.savetxt("stiffness.dat", np.array([stiffness, stiffness_cum]))
+    np.savetxt("stiffness.dat", np.array([[stiffness, stiffness_cum]]))
+    return (U, stiffness, stiffness_cum)
 
 
