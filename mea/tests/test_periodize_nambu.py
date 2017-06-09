@@ -121,10 +121,19 @@ class TestPeriodizeNambu(unittest.TestCase):
         """ """
         y1 = self.modeln.Y1Limit
         y2 = self.modeln.Y2Limit
+        stiffness = stiffness_cum = 0
 
-        stiffness = 2.0/self.beta * (2.0*np.pi)**(-2.0) * dblquad(self.modeln.stiffness, -np.pi, np.pi, y1, y2, args=(0,))[0]
+        #for ii in range(self.sEvec_c.shape[0]):
+        stiffness += 2.0/self.beta * (2.0*np.pi)**(-2.0) * dblquad(self.modeln.stiffness, -np.pi, np.pi, y1, y2, args=(0,))[0]
+        stiffness_cum += 2.0/self.beta * (2.0*np.pi)**(-2.0) * dblquad(self.modeln.stiffness_cum, -np.pi, np.pi, y1, y2, args=(0,))[0]
         stiffness_good = 0.011908416
+        stiff_cum_good = 0.00945944
+        #stiffness_cum_test = self.modeln.stiffness_cum(0.0, np.pi, 0)
+        #print("\n\nstiffness_cum = \n", stiffness_cum)
+        #print("\n\nstiffness = \n", stiffness)
+        #print("\n\nstiffness_cum_test = \n",stiffness_cum_test)
         self.assertAlmostEqual(stiffness, stiffness_good, places=5)
+        self.assertAlmostEqual(stiff_cum_good, stiffness_cum, places=5)
 
 
 

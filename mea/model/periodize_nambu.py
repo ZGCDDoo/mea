@@ -11,6 +11,7 @@ class ModelNambu:
 
         self.t = t ; self.tp = tp; self.mu = mu ; 
         self.z_vec = z_vec ; self.sEvec_c = sEvec_c
+        self.cumulants = self.build_cumulants()
         return None
 
 
@@ -57,6 +58,21 @@ class ModelNambu:
         return gf_ktilde       
 
 
+    def build_cumulants(self):
+        """ """
+
+        cumulants = np.zeros(self.sEvec_c.shape, dtype=complex)
+        for ii in range(cumulants.shape[0]):
+            tmp = np.zeros((8, 8), dtype=complex)
+            (zz, mu, sE) = (self.z_vec[ii], self.mu, self.sEvec_c[ii])
+            tmp[0, 0] = tmp[1, 1] = tmp[2, 2] = tmp[3, 3] = (zz + mu)
+            tmp[4, 4] = tmp[5, 5] = tmp[6, 6] = tmp[7, 7] = -np.conjugate(-np.conjugate(zz) + mu)
+            tmp -= sE
+            tmp = linalg.inv(tmp.copy())
+            cumulants[ii] = tmp.copy()
+        
+        return cumulants    
+
     
     def Y1Limit(self, x: float) -> float:
         return -np.pi
@@ -87,32 +103,34 @@ class ModelNambu:
         return dos
 
 
+    def periodize(self, kx: float, ky: float, arg):
+        """ """
+        
+        ex = np.exp(1.0j*kx)
+        ey = np.exp(1.0j*ky)
+        v = np.array([1., ex, ex*ey, ey], dtype=complex)
+        nambu_periodized = np.zeros((2, 2), dtype=complex)
+
+        for  i in range(4):
+            for j in range(4):
+                nambu_periodized[0, 0] += np.conj(v[i])*arg[i, j]*v[j]
+                nambu_periodized[0, 1] += np.conj(v[i])*arg[i, j + 4]*v[j]
+                nambu_periodized[1, 0] += np.conj(v[i])*arg[i + 4, j]*v[j]
+                nambu_periodized[1, 1] += np.conj(v[i])*arg[i + 4, j + 4]*v[j]
+        
+        return (0.25*nambu_periodized)
+
 
     def periodize_nambu(self, kx: float, ky: float, ii: int): # Green periodization
         """ """
         nambu_ktilde = self.build_gf_ktilde(kx, ky, ii)
-        ex = np.exp(1.0j*kx)
-        ey = np.exp(1.0j*ky)
-        v = np.array([1., ex, ex*ey, ey], dtype=complex)
-        
-        nambu_periodized = np.zeros((2, 2), dtype=complex)
-            
-        for  i in range(4):
-            for j in range(4):
-                nambu_periodized[0, 0] += np.conj(v[i])*nambu_ktilde[i, j]*v[j]
-                nambu_periodized[0, 1] += np.conj(v[i])*nambu_ktilde[i, j + 4]*v[j]
-                nambu_periodized[1, 0] += np.conj(v[i])*nambu_ktilde[i + 4, j]*v[j]
-                nambu_periodized[1, 1] += np.conj(v[i])*nambu_ktilde[i + 4, j + 4]*v[j]
-        
-        
-        nambu_periodized = 0.25*nambu_periodized
 
-        return nambu_periodized
+        return self.periodize(kx, ky, nambu_ktilde) 
 
 
     def stiffness(self, kx: float, ky: float, ii: int) -> float:
         """ """
-        nambu_periodized = self.periodize_nambu(kx, ky, ii)
+        nambu_periodized = self.periodize(kx, ky, self.build_gf_ktilde(kx, ky, ii)) #self.periodize_nambu(kx, ky, ii)
         #coskx: float = np.cos(kx) 
         #cosky: float = np.cos(ky)
         #tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
@@ -121,6 +139,26 @@ class ModelNambu:
         tperp_squared = 2.0
         return (-1.0 * np.real(-4.0*tperp_squared*nambu_periodized[0, 1]*nambu_periodized[1, 0]))
 
+
+    def periodize_cumulant(self, kx: float, ky: float, ii: int): # cumulant periodization
+        """ """
+        tmp = linalg.inv(self.periodize(kx, ky, self.cumulants[ii]))
+        eps = -2.0*self.t*(np.cos(kx) + np.cos(ky)) - 4.0*self.tp*np.cos(kx + ky)
+        tmp[0, 0] -= eps; tmp[1, 1] += eps
+        return linalg.inv(tmp)
+
+
+    def stiffness_cum(self, kx: float, ky: float, ii: int) -> float:
+        """ """
+        
+        nambu_periodized = self.periodize_cumulant(kx, ky, ii) #linalg.inv(tmp.copy())
+        #coskx: float = np.cos(kx) 
+        #cosky: float = np.cos(ky)
+        #tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
+        #tperp_squared = tperp*tperp
+        #N_c = 4.0
+        tperp_squared = 2.0
+        return (-1.0 * np.real(-4.0*tperp_squared*nambu_periodized[0, 1]*nambu_periodized[1, 0]))    
 
 
     def matsubara_surface(self, fout: str ="matsubara_surface.dat"):
