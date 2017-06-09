@@ -143,7 +143,7 @@ class ModelNambu:
     def periodize_cumulant(self, kx: float, ky: float, ii: int): # cumulant periodization
         """ """
         tmp = linalg.inv(self.periodize(kx, ky, self.cumulants[ii]))
-        eps = -2.0*self.t*(np.cos(kx) + np.cos(ky)) - 4.0*self.tp*np.cos(kx + ky)
+        eps = -2.0*self.t*(np.cos(kx) + np.cos(ky)) - 2.0*self.tp*np.cos(kx + ky)
         tmp[0, 0] -= eps; tmp[1, 1] += eps
         return linalg.inv(tmp)
 

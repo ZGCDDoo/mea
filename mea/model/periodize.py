@@ -13,6 +13,21 @@ class Model:
         assert z_vec.shape[0] == sEvec_c.shape[0]
         self.t = t ; self.tp = tp; self.mu = mu 
         self.z_vec = z_vec ; self.sEvec_c = sEvec_c
+        self.cumulants = self.build_cumulants()
+        return None
+
+    def build_cumulants(self):
+        """ """
+        cumulants = np.zeros(self.sEvec_c.shape, dtype=complex)
+        for ii in range(cumulants.shape[0]):
+            tmp = np.zeros((4, 4), dtype=complex)
+            (zz, mu, sE) = (self.z_vec[ii], self.mu, self.sEvec_c[ii])
+            tmp[0, 0] = tmp[1, 1] = tmp[2, 2] = tmp[3, 3] = (zz + mu)
+            tmp -= sE
+            tmp = linalg.inv(tmp.copy())
+            cumulants[ii] = tmp.copy()
+        
+        return cumulants  
 
 
     def t_value(self, kx: float, ky: float) : # This is t_ij(k_tilde)
@@ -101,28 +116,43 @@ class Model:
 
     def periodize_Akw(self, kx: float, ky: float, ii: int) -> float: # periodize the imaginary part (Ak_w)
         """ """
-        N_c: int = 4
         gf_ktilde = self.build_gf_ktilde(kx, ky, ii)
-        expk = self.exp_k(kx, ky)
-        gf_w_lattice = 1/N_c * np.dot(np.conjugate(expk), np.dot(gf_ktilde, expk))
-
+        gf_w_lattice = self.periodize(kx, ky, gf_ktilde)
         return (-2.0*gf_w_lattice.imag)
+
+
+    def periodize(self, kx: float, ky: float, arg) -> float:
+        """ """
+        N_c: int = 4
+        expk = self.exp_k(kx, ky)
+        return(1/N_c * np.dot(np.conjugate(expk), np.dot(arg, expk)))
 
 
     def periodize_Akw2(self, kx: float, ky: float, ii:int) -> float:
         return (self.periodize_Akw(kx, ky, ii)**2.0)
 
 
-    def calc_dos(self, fout_name="dos.txt"):
-        """ """
-        sEvec_c = self.sEvec_c; z_vec = self.z_vec; t = self.t ; tp = self.tp; mu = self.mu
+    def periodize_Akw_cum(self, kx: float, ky: float, ii:int) -> float:
+        tmp = 1.0/self.periodize(kx, ky, self.cumulants[ii])
+        tmp -= -2.0*self.t*(np.cos(kx) + np.cos(ky)) - 2.0*self.tp*np.cos(kx + ky)
+        return ((-2.0/tmp).imag)
+    
+
+    def periodize_Akw2_cum(self, kx: float, ky: float, ii:int) -> float:
+        return (self.periodize_Akw_cum(kx, ky, ii)**2.0)
+
+
+    def calc_dos(self, fout_name="dos.txt", fct="periodize_Akw"):
+        """fct can be periodize_Akw or periodize_Akw_cum"""
+        
+        sEvec_c = self.sEvec_c; z_vec = self.z_vec
         len_sEvec_c = sEvec_c.shape[0]
         dos = np.zeros(len_sEvec_c)
 
         ii: int
         for ii in range(len_sEvec_c):
             #print("IN LOOP of dos # ", n, " out of ", len_sEvec_c, "\n")
-            dos[ii] = (2.0*np.pi)**(-2.0)*dblquad(self.periodize_Akw, -np.pi, np.pi, self.ky1Limit, self.ky2Limit, args=(ii,))[0]
+            dos[ii] = (2.0*np.pi)**(-2.0)*dblquad(getattr(self, fct), -np.pi, np.pi, self.ky1Limit, self.ky2Limit, args=(ii,))[0]
         dos_out = np.transpose([z_vec, dos])
         np.savetxt(fout_name, dos_out)
         return dos
@@ -137,7 +167,7 @@ class Model:
 
     def calc_dos_with_trace(self, fout_name="dos_trace.txt"):
         """ """
-        sEvec_c = self.sEvec_c; z_vec = self.z_vec; t = self.t ; tp = self.tp; mu = self.mu
+        sEvec_c = self.sEvec_c; z_vec = self.z_vec
         len_sEvec_c = sEvec_c.shape[0]
         dos = np.zeros(len_sEvec_c)
         for ii in range(len_sEvec_c):
