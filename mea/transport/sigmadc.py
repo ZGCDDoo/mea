@@ -1,7 +1,7 @@
 import numpy as np # type: ignore
 from ..model import periodize # type: ignore
 import scipy.integrate as sI # type: ignore
-
+from ..tools import fmanip
 
 class SigmaDC:
 
@@ -33,26 +33,35 @@ class SigmaDC:
 
 
     def calc_sigmadc(self) -> float:
-        """ """
+        
         sigma_dc: float  = 0.0
         Akw2 = self.model.periodize_Akw2
+        Akw2_cum = self.model.periodize_Akw2_cum
 
         integrand_w = np.zeros(self.model.z_vec.shape)
+        integrand_w_cum = np.zeros(self.model.z_vec.shape)
         for (i, ww) in enumerate(self.model.z_vec):
 
             if abs(self.beta*ww) > self.cutoff:
                 integrand_w[i] = 0.0
+                integrand_w_cum[i] = 0.0
             else:
                 integrand_w[i] = 1.0/(2.0*np.pi)**(2.0)*sI.dblquad(Akw2, -np.pi, np.pi, self.y1, self.y2, epsabs=1e-8,
                                                                    args=(i,) )[0]
-                integrand_w[i] *= self.dfd_dw(ww)
+                integrand_w_cum[i] = 1.0/(2.0*np.pi)**(2.0)*sI.dblquad(Akw2_cum, -np.pi, np.pi, self.y1, self.y2, epsabs=1e-8,
+                                                                   args=(i,) )[0]                                                  
+                dfd_dw  = self.dfd_dw(ww)
+                integrand_w[i] *= dfd_dw
+                integrand_w_cum[i] *= dfd_dw
             
-        sigma_dc = 1.0/(2.0*np.pi)*sI.simps(integrand_w, self.model.z_vec)
+        sigma_dc = 1.0/(2.0*np.pi)*np.array([[sI.simps(integrand_w, self.model.z_vec), sI.simps(integrand_w_cum, self.model.z_vec) ]])  
         sigma_dc *= self.prefactor
 
         print("sigma_dc = ", sigma_dc)
         with open("sigmadc.dat", mode="a") as fout:
-            fout.write(str(sigma_dc) + "\n")
+            for sigma in sigma_dc.flatten():
+                fout.write(str(sigma) + " ")
+            fout.write("\n")
             
         return sigma_dc
 

@@ -214,7 +214,7 @@ class Model:
         t = self.t; tp = self.tp; sEvec_c = self.sEvec_c; z_vec = self.z_vec; mu = self.mu
         sEvec_w = self.build_sE_lattice_vec(kx, ky)
         np.savetxt("sEw_Periodized.dat", np.transpose([z_vec, sEvec_w.real, sEvec_w.imag]))
-        w0: float = self.eps_0(kx, ky) - mu
+        w0: float = 0.0#self.eps_0(kx, ky) - mu
         indicesgreater = np.where(z_vec > w0)[0]
         indicesless = np.where(z_vec < w0)[0]
         grid1 = np.array([indicesless[-1], indicesgreater[0], indicesgreater[1]])
@@ -232,7 +232,8 @@ class Model:
         derivative2 = 2.0*w0*coefs2[0] + coefs2[1]
         zk1: float = 1.0/(1.0 - derivative1)
         zk2: float = 1.0/(1.0 - derivative2)
-        return ((zk1, zk2))
+        zk_naif = 1.0/(1.0 - (fct1[-1] - fct1[0])/(grid1[-1] - grid1[0]) )
+        return ((zk_naif, zk1, zk2))
 
 
     def fermi_surface(self, w_value, fout="fermi_surface.dat"):

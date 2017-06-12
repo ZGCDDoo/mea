@@ -60,7 +60,7 @@ class TestSigmaDC(unittest.TestCase):
     def test_calc_sigmadc(self):
         """ """
         self.sdc.cutoff = 8.0
-        self.assertAlmostEqual(self.sdc.calc_sigmadc(), 0.761333, 3)              
+        self.assertAlmostEqual(self.sdc.calc_sigmadc()[0, 0], 0.761333, 3)              
 
 
 if __name__ == "__main__":

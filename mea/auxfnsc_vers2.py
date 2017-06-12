@@ -140,6 +140,11 @@ class GFAuxSC():
         self.acon.acon()
         # print("after gf_aux.acon() \n")
         self.Aw_t_list = deepcopy(self.acon.Aw_t_list)
+        
+        # force anti-symmetry on the anomalous spectral function:
+        for (ii, Aw_t) in enumerate(self.Aw_t_list):
+            Aw_t[:, -1] = 0.5*(Aw_t[:, -1] - Aw_t[:, -1][::-1])
+
 
         for (i, (w_vec, Aw_aux_t)) in enumerate(zip(self.acon.w_vec_list, self.acon.Aw_t_list)):
             if w_vec is None:
