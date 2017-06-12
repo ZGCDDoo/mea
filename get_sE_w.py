@@ -1,7 +1,7 @@
 from mea.tools import kramerskronig as kk
 import json
 from scipy import linalg
-import nmpy as np
+import numpy as np
 from mea.model import nambu
 
 

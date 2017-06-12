@@ -35,3 +35,23 @@ def stiffness(fname):
     return (U, stiffness, stiffness_cum)
 
 
+def stiff_walk(fname="self_moy.dat"):
+    """walk a directory and get the stiffness for all subdirectories """
+    folderlist = list(map(os.path.abspath, os.listdir()))
+    cwd = os.getcwd()
+
+    stifflist = []
+    for folder in folderlist:
+        os.chdir(folder)
+        os.chdir(glob.glob("Stats*")[0])
+        result = stiffness.stiffness(fname)
+        stifflist.append(result)
+        os.chdir(cwd)
+        with open("output_stiff_walk.dat", mode="a") as fout:
+            for element in result:
+                fout.write(str(element)); fout.write(" ")
+            fout.write("\n")
+    
+    print("\nstifflist = ", stifflist)
+
+
