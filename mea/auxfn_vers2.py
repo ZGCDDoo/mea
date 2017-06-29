@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 #creating new branch MaxEntAux
 """
-
+Same as auxfn.py, but passage to the irreducible basis is done after performing the auxiliary_fn.abs
+Whereas in auxfn.py we transform the sE to the ir basis before doing the gfaux.
 """
 
 import numpy as np
@@ -88,6 +89,7 @@ class GFAux():
         # on the real axis
         self.w_vec_list = []
         self.sEvec_irw_list = []
+        self.sEvec_cw_list = []
         self.sE_infty_w = self.sE_infty  # the high frequency expansion zero term is the same for all complex zn 
         self.Aw_t_list = []
         self.gfvec_aux_irtw_list= []
@@ -114,10 +116,10 @@ class GFAux():
         assert(self.gfvec_aux_ir.shape == (self.zn_vec.shape[0] , 4 ,4))
 
         # iterate over matsubara freq.
-        for (i, sE) in enumerate(sEvec_ir):
+        for (i, sE) in enumerate(self.sEvec_c):
             zz = (1.0j*self.zn_vec[i] + self.mu)
-            self.gfvec_aux_ir[i] = linalg.inv(zz*self.II - sE + self.sE_infty ) if self.rm_sE_ifty \
-                             else linalg.inv(zz*self.II - sE)
+            self.gfvec_aux_ir[i] = green.c_to_ir(linalg.inv(zz*self.II - sE + self.sE_infty )) if self.rm_sE_ifty \
+                             else green.c_to_ir(linalg.inv(zz*self.II - sE))
 
         self.gfvec_aux_c = green.ir_to_c(self.gfvec_aux_ir)
 
@@ -147,8 +149,6 @@ class GFAux():
         self.acon.acon()
         # print("after gf_aux.acon() \n")
         self.Aw_t_list = deepcopy(self.acon.Aw_t_list)
-
-        # maybe put interpolation here: see inter.py
 
         for (i, (w_vec, Aw_aux_t)) in enumerate(zip(self.acon.w_vec_list, self.acon.Aw_t_list)):
             if w_vec is None:
@@ -183,24 +183,24 @@ class GFAux():
          """ 
 
         gfvec_irw_list = deepcopy(self.gfvec_aux_irw_list) ; w_vec_list = deepcopy(self.w_vec_list)
-        
+        gfvec_cw_list = map(green.ir_to_c, gfvec_irw_list)
         if fout_sE_ctow is None: fout_sE_ctow = self.fout_sE_ctow
 
-        for (i, (w_vec, gf_irw)) in enumerate(zip(w_vec_list, gfvec_irw_list)):
+        for (i, (w_vec, gf_cw)) in enumerate(zip(w_vec_list, gfvec_cw_list)):
 
-            sEvec_irw = np.zeros(gf_irw.shape, dtype=complex)
+            sEvec_cw = np.zeros(gf_cw.shape, dtype=complex)
 
             # iterate over matsubara freq.
             
-            for (j, gf) in enumerate(gf_irw):
+            for (j, gf) in enumerate(gf_cw):
                 ww = (w_vec[j] + self.mu)
-                sEvec_irw[j] = (ww*self.II + self.sE_infty_w - linalg.inv(gf)) if self.rm_sE_ifty \
+                sEvec_cw[j] = (ww*self.II + self.sE_infty_w - linalg.inv(gf)) if self.rm_sE_ifty \
                                  else (ww*self.II - linalg.inv(gf))
             
-            self.sEvec_irw_list.append(sEvec_irw)
+            self.sEvec_cw_list.append(sEvec_cw)
             fout = fout_sE_ctow.split(".")[0] + str(i) + "." + fout_sE_ctow.split(".")[1] 
 
             fmanip.backup_file(fout)
-            green.save_gf_c(fout, w_vec, green.ir_to_c(sEvec_irw))
+            green.save_gf_c(fout, w_vec, sEvec_cw)
 
 

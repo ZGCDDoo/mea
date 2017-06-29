@@ -1,10 +1,11 @@
 from ..model import periodize_nambu, nambu
 import numpy as np
+import os, glob
 from scipy.integrate import dblquad
 from ..tools import fmanip
 import json
 
-def stiffness(fname):
+def stiffness(fname, param_name="U"):
 
     (zn_vec, sEvec_c) = nambu.read_nambu_c(fname)
 
@@ -14,7 +15,7 @@ def stiffness(fname):
     mu = params["mu"][0]
     beta = params["beta"][0]
     tp = params["tp"][0]
-    U = params["U"][0]
+    U = params[param_name][0]
     stiffness = 0.0
     stiffness_cum = 0.0
 
@@ -35,7 +36,7 @@ def stiffness(fname):
     return (U, stiffness, stiffness_cum)
 
 
-def stiff_walk(fname="self_moy.dat"):
+def stiff_walk(fname="self_moy.dat", param_name="U"):
     """walk a directory and get the stiffness for all subdirectories """
     folderlist = list(map(os.path.abspath, os.listdir()))
     cwd = os.getcwd()
@@ -44,7 +45,7 @@ def stiff_walk(fname="self_moy.dat"):
     for folder in folderlist:
         os.chdir(folder)
         os.chdir(glob.glob("Stats*")[0])
-        result = stiffness.stiffness(fname)
+        result = stiffness(fname, param_name)
         stifflist.append(result)
         os.chdir(cwd)
         with open("output_stiff_walk.dat", mode="a") as fout:

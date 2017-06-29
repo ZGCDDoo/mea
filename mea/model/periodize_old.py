@@ -1,4 +1,4 @@
-from numba import jitclass, jit, double, complex128 # type: ignore
+#from numba import jitclass, jit, double, complex128 # type: ignore
 import numpy as np  # type: ignore
 from scipy import linalg # type: ignore
 from scipy.integrate import dblquad # type: ignore
