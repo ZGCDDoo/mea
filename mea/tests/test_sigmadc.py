@@ -45,7 +45,7 @@ class TestSigmaDC(unittest.TestCase):
         self.assertAlmostEqual(model.t, 1.0)
         self.assertAlmostEqual(model.tp, 0.4)
         self.assertAlmostEqual(model.mu, 3.1736422868580827)
-        self.assertAlmostEqual(sdc.prefactor, -2.0)
+        self.assertAlmostEqual(sdc.prefactor, 2.0)
         self.assertAlmostEqual(sdc.beta, 12.0)
 
     

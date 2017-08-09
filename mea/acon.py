@@ -363,3 +363,4 @@ class ACon():
     def cleanup(self):
         """ """
         logging.info("\n\n End of acon \n\n")
+        logging.shutdown()

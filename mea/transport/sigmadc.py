@@ -9,7 +9,7 @@ class SigmaDC:
         """ """
 
         self.beta = beta
-        self.prefactor = -2.0 #sum on spins,  weistrass-th, v_kz integrated 
+        self.prefactor = 2.0 #sum on spins,  weistrass-th, v_kz integrated 
         self.cutoff = 30  # beta*omega
         self.model = model
 
@@ -51,8 +51,8 @@ class SigmaDC:
                 integrand_w_cum[i] = 1.0/(2.0*np.pi)**(2.0)*sI.dblquad(Akw2_cum, -np.pi, np.pi, self.y1, self.y2, epsabs=1e-8,
                                                                    args=(i,) )[0]                                                  
                 dfd_dw  = self.dfd_dw(ww)
-                integrand_w[i] *= dfd_dw
-                integrand_w_cum[i] *= dfd_dw
+                integrand_w[i] *= -dfd_dw
+                integrand_w_cum[i] *= -dfd_dw
             
         sigma_dc = 1.0/(2.0*np.pi)*np.array([[sI.simps(integrand_w, self.model.z_vec), sI.simps(integrand_w_cum, self.model.z_vec) ]])  
         sigma_dc *= self.prefactor
@@ -83,6 +83,26 @@ class SigmaDC:
 
         return sigma_dc
 
+
+    def calc_sigmadc_interpolation(self)-> float:
+        """preliminary and not tested. """
+        
+        
+        sigma_dc: float  = 0.0
+        
+        def Akw_0(kx, ky):
+            im_gf = np.zeros(3)
+            for jj in range(0, 3):
+                im_gf[jj] = self.model.periodize_Akw(kx, ky, jj)
+            return (np.polyfit(self.model.z_vec[0:3].imag, im_gf, 2)[-1])
+        
+        sigma_dc += 1.0/(2.0*np.pi)**(2.0)*sI.dblquad(Akw_0, -np.pi, np.pi, self.y1, self.y2, epsabs=1e-8 )[0]
+        sigma_dc *= 1.0/(2.0*np.pi)  
+        sigma_dc *= self.prefactor
+
+        print("sigma_dc = ", sigma_dc)
+            
+        return sigma_dc
 
 
 

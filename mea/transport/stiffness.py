@@ -18,22 +18,26 @@ def stiffness(fname, param_name="U"):
     U = params[param_name][0]
     stiffness = 0.0
     stiffness_cum = 0.0
+    stiffness_trace = 0.0
 
     model_sc = periodize_nambu.ModelNambu(1.0, tp, mu, 1.0j*zn_vec, sEvec_c)
     Y1 = model_sc.Y1Limit
     Y2 = model_sc.Y2Limit
 
+    N_c = 4.0
     for ii in range(zn_vec.shape[0]):
         stiffness += 2.0/beta*1.0/(2.0*np.pi)**2*dblquad(model_sc.stiffness, -np.pi, np.pi, Y1, Y2, args=(ii,) )[0]
         stiffness_cum += 2.0/beta*1.0/(2.0*np.pi)**2*dblquad(model_sc.stiffness_cum, -np.pi, np.pi, Y1, Y2, args=(ii,) )[0]
+        stiffness_trace += 2.0/beta*N_c/(2.0*np.pi)**2*dblquad(model_sc.stiffness_trace, -np.pi/2.0, np.pi/2.0, 
+                                                                lambda x: -np.pi/2.0, lambda x: np.pi/2.0, args=(ii,) )[0]
         #print("stiffness = ", stiffness)
 
-    print("\n\n\n lattice stiffness \n\n.")
-    print("stiffness = ", stiffness)
-    print("\nstiffness_cum = ", stiffness_cum)
+    #print("\n\n\n lattice stiffness \n\n.")
+    #print("stiffness = ", stiffness)
+    #print("\nstiffness_cum = ", stiffness_cum)
     fmanip.backup_file("stiffness.dat")
-    np.savetxt("stiffness.dat", np.array([[stiffness, stiffness_cum]]))
-    return (U, stiffness, stiffness_cum)
+    np.savetxt("stiffness.dat", np.array([[stiffness, stiffness_cum, stiffness_trace]]))
+    return (U, stiffness, stiffness_cum, stiffness_trace)
 
 
 def stiff_walk(fname="self_moy.dat", param_name="U"):
@@ -53,6 +57,6 @@ def stiff_walk(fname="self_moy.dat", param_name="U"):
                 fout.write(str(element)); fout.write(" ")
             fout.write("\n")
     
-    print("\nstifflist = ", stifflist)
+    #print("\nstifflist = ", stifflist)
 
 

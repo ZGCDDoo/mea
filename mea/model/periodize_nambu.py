@@ -160,7 +160,13 @@ class ModelNambu:
         tperp_squared = 2.0
         return (-1.0 * np.real(-4.0*tperp_squared*nambu_periodized[0, 1]*nambu_periodized[1, 0]))    
 
-
+    def stiffness_trace(self, kx: float, ky: float, ii: int) -> float:
+        """ """
+        gf_ktilde = self.build_gf_ktilde(kx, ky, ii)
+        trace = np.trace(np.dot(gf_ktilde[:4:, 4::], gf_ktilde[4::, :4:]))    
+        tperp_squared = 2.0
+        return (np.real(trace))
+    
     def matsubara_surface(self, fout: str ="matsubara_surface.dat"):
         """Plot the norm of the gorkov function as a function of kx, ky."""
         
