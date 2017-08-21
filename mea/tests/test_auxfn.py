@@ -131,8 +131,8 @@ class TestGFAux(unittest.TestCase):
         try:
             np.testing.assert_allclose(w_n.shape, w_n_manual.shape)
             np.testing.assert_allclose(Aw.shape, Aw_manual.shape)
-            test_tools.compare_arrays(w_n, w_n_manual, rprecision=10**-2, n_diff_max=5, zero_equivalent=10**-5)
-            test_tools.compare_arrays(Aw, Aw_manual, rprecision=10**-2, n_diff_max=5, zero_equivalent=10**-5)
+            test_tools.compare_arrays(w_n, w_n_manual, rprecision=10**-3, n_diff_max=0, zero_equivalent=10**-5)
+            test_tools.compare_arrays(Aw, Aw_manual, rprecision=10**-3, n_diff_max=0, zero_equivalent=10**-5)
         except AssertionError:
             self.fail("ayaya np.allclose failed at test_build_gf_aux")   
 
@@ -165,7 +165,7 @@ class TestGFAux(unittest.TestCase):
                     tmp = abs(arr1[i] - arr2[i])/abs(arr1[i])
                     if tmp > 10**-2.0:
                         print(tmp)
-            test_tools.compare_arrays(sE_w_to_test, sE_w_to_test_good, rprecision=10**-2, n_diff_max=10, zero_equivalent=10**-2)
+            test_tools.compare_arrays(sE_w_to_test, sE_w_to_test_good, rprecision=10**-2, n_diff_max=2, zero_equivalent=10**-4)
             #np.testing.assert_allclose(sE_w_to_test, sE_w_to_test_good, rtol=1e-3)
         except AssertionError:
             self.fail("Ayaya, np.allclose failed at test_get_sE_w")

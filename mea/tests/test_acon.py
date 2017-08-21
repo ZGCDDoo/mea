@@ -10,7 +10,7 @@ import unittest
 
 import os
 from .. import acon
-
+from .test_tools import compare_arrays
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")
 gf_t_file = os.path.join(currentdir, "files/greenMoy.dat")
@@ -182,10 +182,10 @@ class TestAcon(unittest.TestCase):
         try:
             np.testing.assert_allclose(ac.zn_vec, zn_vec , rtol=1e-4)
             np.testing.assert_allclose(ac.gf_t, gf_t, rtol=1e-4)
-            np.testing.assert_allclose(ac.w_vec_list[0], w_vec0, rtol=1e-4)           
-            np.testing.assert_allclose(ac.Aw_t_list[0], Aw_t_good0, rtol=1e-4)
+            np.testing.assert_allclose(ac.w_vec_list[0], w_vec0, rtol=1e-4)
+            compare_arrays(ac.Aw_t_list[0], Aw_t_good0, rprecision=1e-4)         
             np.testing.assert_allclose(ac.w_vec_list[1], w_vec1, rtol=1e-4)           
-            np.testing.assert_allclose(ac.Aw_t_list[1], Aw_t_good1, rtol=1e-4)
+            compare_arrays(ac.Aw_t_list[1], Aw_t_good1, rprecision=1e-4)
         except AssertionError:
             self.fail("np.testing.assert_array_allclose failed at test_acon")
         
