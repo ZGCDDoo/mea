@@ -11,7 +11,7 @@ sys.path.insert(0, parentdir)
 sys.path.insert(0, currentdir)
 
 import numpy as np
-from . import green
+from .io_triangle import IOTriangle as green
 
 def read_nambu_c(fin_nambu_to, zn_col=0):
     """Reads the cluster nambu in a tabular-out form in the cluster
@@ -41,12 +41,12 @@ def read_nambu_c(fin_nambu_to, zn_col=0):
 
 # same as in green.py so maybe do a sort of virutal fonction or simply call green to avoid code duplication
 def read_nambu_infty(nambu):
-    return green.read_green_infty(nambu)
+    return green().read_green_infty(nambu)
     
 
 # same as in green.py so maybe do a sort of virutal fonction or simply call green to avoid code duplication
 def to_to_t(nambu_to):
-    return green.to_to_t(nambu_to)
+    return green().to_to_t(nambu_to)
 
 
 # same as in green.py so maybe do a sort of virutal fonction or simply call green to avoid code duplication
@@ -75,7 +75,7 @@ def t_to_c(z_n, nambu_t):
     gf_normal_down = np.zeros((z_n.shape[0], 4, 4), dtype=complex)
     gf_gorkov = np.zeros((z_n.shape[0], 4, 4), dtype=complex)
 
-    gf_normal_up = green.t_to_c(z_n, nambu_t[:, :-1])
+    gf_normal_up = green().t_to_c(z_n, nambu_t[:, :-1])
     gf_normal_down = np.conjugate(gf_normal_up.copy())
 
     nambu_t[:, -1] = nambu_t[:, -1].real.copy() #for d-wave the anomalous self-energy is real, thus discard the imaginary part
@@ -256,7 +256,7 @@ def t_to_ir(z_n, nambu_t, is_ww=False):
     """if on real axis, then the down part of the nambu spinor needs to have the frequency grid flipped."""
     z_n = z_n.copy();  nambu_t = nambu_t.copy()
     assert(z_n.shape[0] == nambu_t.shape[0])
-    gf_normal_up = green.t_to_ir(z_n, nambu_t[:, :-1:])
+    gf_normal_up = green().t_to_ir(z_n, nambu_t[:, :-1:])
     gf_normal_down = np.conjugate(gf_normal_up)
 
     gf_gorkov = np.zeros((z_n.shape[0], 4, 4), dtype=complex)

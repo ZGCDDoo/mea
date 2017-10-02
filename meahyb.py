@@ -1,7 +1,7 @@
 # coding: utf-8
 import numpy as  np
 from mea import acon
-from mea.model import green
+from mea.model.io_triangle import IOTriangle as green
 import shutil
 from mea.tools import kramerskronig as kk
 from copy import deepcopy
@@ -25,8 +25,8 @@ tloc = np.array([[0.0, -t, -tp, -t],
 
 
 
-(znvec, sEvec_c) = green.read_green_c("self_moy.dat")
-(znvec2, hybvec_c) = green.read_green_c("hyb_moy.dat")
+(znvec, sEvec_c) = green().read_green_c("self_moy.dat")
+(znvec2, hybvec_c) = green().read_green_c("hyb_moy.dat")
 
 gfvec_aux_c = np.zeros(sEvec_c.shape, dtype=complex)
 
@@ -35,13 +35,13 @@ for ii in range(sEvec_c.shape[0]):
     hyb = hybvec_c[ii, 0, 0]
     gfvec_aux_c[ii] = linalg.inv((1.0j*znvec[ii] + mu)*np.eye(4) - hyb - tloc - sEvec_c[ii])
 
-gfvec_aux_ir = green.c_to_ir(gfvec_aux_c)
+gfvec_aux_ir = green().c_to_ir(gfvec_aux_c)
 
 #AC of hyb and aux
 ac_hyb = acon.ACon(hybvec_c[:, 0, 0][:,np.newaxis], znvec, loc=(0,), non_loc=(), non_loc_sign=(), non_loc_to_conjugate=() ) ; ac_hyb.acon()
 shutil.move("Result_OME", "Result_OME_hyb")
 
-ac_aux = acon.ACon(green.ir_to_t(znvec, gfvec_aux_ir), znvec) ; ac_aux.acon()
+ac_aux = acon.ACon(green().ir_to_t(znvec, gfvec_aux_ir), znvec) ; ac_aux.run_acon()
 shutil.move("Result_OME", "Result_OME_gfaux")
 
 
@@ -68,11 +68,11 @@ for (ii, (w_vec, Aw_t)) in enumerate(zip(ac_aux.w_vec_list, ac_aux.Aw_t_list)):
     for jj in range(Aw_t.shape[1]):
         gfvec_aux_irtw[:, jj] = -0.5*(kk.KramersKroning(w_vec, Aw_t[:, jj]) + 1.0j*Aw_t[:, jj])
     gfvec_aux_irtw_list.append(gfvec_aux_irtw)
-    gfvec_aux_irw_list.append(green.t_to_ir(w_vec, gfvec_aux_irtw))
+    gfvec_aux_irw_list.append(green().t_to_ir(w_vec, gfvec_aux_irtw))
 
 
 #now extract self-energy
-gfvec_aux_cw_list = map(green.ir_to_c, gfvec_aux_irw_list)
+gfvec_aux_cw_list = map(green().ir_to_c, gfvec_aux_irw_list)
 sEvec_cw_list = []
 
 
@@ -88,4 +88,4 @@ for(ii, (w_vec, gfvec_aux_cw)) in enumerate(zip(ac_aux.w_vec_list, gfvec_aux_cw_
     sEvec_cw_list.append(sEvec_cw)
     fout_sE =  "self_ctow" + str(ii) + ".dat"
 
-    green.save_gf_c(fout_sE, w_vec, sEvec_cw)
+    green().save_gf_c(fout_sE, w_vec, sEvec_cw)

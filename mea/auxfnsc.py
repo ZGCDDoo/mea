@@ -18,7 +18,7 @@ import os, sys, inspect
 from . import auxfn
 from .tools import kramerskronig as kk
 from . import acon 
-from .model import green, nambu, periodize_nambu
+from .model import nambu, periodize_nambu
 
 
 

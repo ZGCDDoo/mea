@@ -1,7 +1,7 @@
 # coding: utf-8
 import numpy as  np
 from mea import acon
-from mea.model import green
+from mea.model.io_triangle import IOTriangle as green
 import shutil
 from mea.tools import kramerskronig as kk
 from copy import deepcopy
@@ -25,16 +25,16 @@ tloc = np.array([[0.0, -t, -tp, -t],
 
 
 
-(znvec2, gfvec_c) = green.read_green_c("green_moy.dat")
-(znvec, hybvec_c) = green.read_green_c("hyb_moy.dat")
-hybvec_ir = green.c_to_ir(hybvec_c) ; gfvec_ir = green.c_to_ir(gfvec_c)
+(znvec2, gfvec_c) = green().read_green_c("green_moy.dat")
+(znvec, hybvec_c) = green().read_green_c("hyb_moy.dat")
+hybvec_ir = green().c_to_ir(hybvec_c) ; gfvec_ir = green().c_to_ir(gfvec_c)
 np.testing.assert_allclose(znvec, znvec2)
 
 #AC of hyb and g_cl
-achyb = acon.ACon(green.ir_to_t(znvec, hybvec_ir), znvec) ; achyb.acon()
+achyb = acon.ACon(green().ir_to_t(znvec, hybvec_ir), znvec) ; achyb.run_acon()
 shutil.move("Result_OME", "Result_OME_hyb")
 
-acgf = acon.ACon(green.ir_to_t(znvec, gfvec_ir), znvec); acgf.acon()
+acgf = acon.ACon(green().ir_to_t(znvec, gfvec_ir), znvec); acgf.run_acon()
 shutil.move("Result_OME", "Result_OME_gf")
 
 #now get everything on real axis by kramers-kronig
@@ -55,7 +55,7 @@ for (ii, (w_vec, Aw_t)) in enumerate(zip(achyb.w_vec_list, achyb.Aw_t_list)):
         hybvec_irtw[:, jj] = -0.5*(kk.KramersKroning(w_vec, Aw_t[:, jj]) + 1.0j*Aw_t[:, jj])
     hybvec_irtw_list.append(hybvec_irtw)
     w_vec_list.append(w_vec)    
-    hybvec_irw_list.append(green.t_to_ir(w_vec, hybvec_irtw))
+    hybvec_irw_list.append(green().t_to_ir(w_vec, hybvec_irtw))
 
 
 
@@ -66,7 +66,7 @@ for (ii, (w_vec, Aw_t)) in enumerate(zip(acgf.w_vec_list, acgf.Aw_t_list)):
     for jj in range(Aw_t.shape[1]):
         gfvec_irtw[:, jj] = -0.5*(kk.KramersKroning(w_vec, Aw_t[:, jj]) + 1.0j*Aw_t[:, jj])
     gfvec_irtw_list.append(gfvec_irtw)
-    gfvec_irw_list.append(green.t_to_ir(w_vec, gfvec_irtw))
+    gfvec_irw_list.append(green().t_to_ir(w_vec, gfvec_irtw))
 
 
 
@@ -75,13 +75,13 @@ for (ii, (w_vec, hybvec, gfvec)) in enumerate(zip(w_vec_list, hybvec_irw_list, g
     fout_hyb = "hyb_irtow" + str(ii) + ".dat"
     fout_gf = "gf_irtow" + str(ii) + ".dat"
     print("in save fct.....\n\n")
-    green.save_gf_ir(fout_hyb, w_vec, hybvec)
-    green.save_gf_ir(fout_gf, w_vec, gfvec)
+    green().save_gf_ir(fout_hyb, w_vec, hybvec)
+    green().save_gf_ir(fout_gf, w_vec, gfvec)
 
 
 #now extract self-energy
-hybvec_cw_list = map(green.ir_to_c, hybvec_irw_list)
-gfvec_cw_list = map(green.ir_to_c, gfvec_irw_list)
+hybvec_cw_list = map(green().ir_to_c, hybvec_irw_list)
+gfvec_cw_list = map(green().ir_to_c, gfvec_irw_list)
 sEvec_cw_list = []
 
 
@@ -95,5 +95,5 @@ for(ii, (w_vec, hybvec_cw, gfvec_cw)) in enumerate(zip(w_vec_list, hybvec_cw_lis
     sEvec_cw_list.append(sEvec_cw)
     fout_sE =  "self_ctow" + str(ii) + ".dat"
 
-    green.save_gf_c(fout_sE, w_vec, sEvec_cw)
+    green().save_gf_c(fout_sE, w_vec, sEvec_cw)
 

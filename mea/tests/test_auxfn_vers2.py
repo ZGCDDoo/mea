@@ -10,7 +10,7 @@ import unittest
 from scipy import linalg
 
 from .. import auxfn_vers2 as auxfn
-from ..model import green
+from ..model.io_triangle import IOTriangle as green
 from . import test_tools
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")
@@ -74,9 +74,9 @@ class TestGFAuxC(unittest.TestCase):
         sEvec_c[:, 2, 0] = sEvec_c[:, 0, 2] ; sEvec_c[:, 2, 1] = sEvec_c[:, 1, 2] ; sEvec_c[:, 2, 2] = sEvec_c[:, 0, 0] ; sEvec_c[:, 2, 3] = sEvec_c[:, 0, 1]
         sEvec_c[:, 3, 0] = sEvec_c[:, 0, 3] ; sEvec_c[:, 3, 1] = sEvec_c[:, 1, 3] ; sEvec_c[:, 3, 2] = sEvec_c[:, 2, 3] ; sEvec_c[:, 3, 3] = sEvec_c[:, 1, 1]
 
-        sEvec_ir = green.c_to_ir(sEvec_c)
+        sEvec_ir = green().c_to_ir(sEvec_c)
 
-        sE_ifty = green.read_green_infty(sEvec_ir)
+        sE_ifty = green().read_green_infty(sEvec_ir)
 
      
         
@@ -88,7 +88,7 @@ class TestGFAuxC(unittest.TestCase):
             zz = 1.0j*zn_vec[i] + mu
             gfvec_test_c[i] = linalg.inv(np.eye(4)*zz - sE)
 
-        gfvec_test_ir = green.c_to_ir(gfvec_test_c)
+        gfvec_test_ir = green().c_to_ir(gfvec_test_c)
 
 
         try:

@@ -12,7 +12,7 @@ from copy import deepcopy
 import os
 from .tools import fmanip
 from .tools import kramerskronig as kk
-from .model import green
+from .model.io_triangle import IOTriangle as green
 from . import acon
 from . import auxfn
 
@@ -54,12 +54,12 @@ class GFAuxC(auxfn.GFAux):
             self.gfvec_aux_c[i] = linalg.inv(zz*self.II - sE + self.sE_infty) if self.rm_sE_ifty \
                              else linalg.inv(zz*self.II - sE)
 
-        self.gfvec_aux_ir = green.c_to_ir(self.gfvec_aux_c)
+        self.gfvec_aux_ir = green().c_to_ir(self.gfvec_aux_c)
 
         # save the gfvec_aux_ir in a txt file   
          
         fmanip.backup_file(self.fout_gf_aux_to)    
-        green.save_gf_ir(self.fout_gf_aux_to, self.zn_vec, self.gfvec_aux_ir)         
+        green().save_gf_ir(self.fout_gf_aux_to, self.zn_vec, self.gfvec_aux_ir)         
             
         
     
@@ -86,7 +86,7 @@ class GFAuxC(auxfn.GFAux):
          """ 
 
         gfvec_irw_list = deepcopy(self.gfvec_aux_irw_list) ; w_vec_list = deepcopy(self.w_vec_list)
-        gfvec_cw_list = map(green.ir_to_c, gfvec_irw_list)
+        gfvec_cw_list = map(green().ir_to_c, gfvec_irw_list)
         if fout_sE_ctow is None: fout_sE_ctow = self.fout_sE_ctow
 
         for (i, (w_vec, gf_cw)) in enumerate(zip(w_vec_list, gfvec_cw_list)):
@@ -104,6 +104,6 @@ class GFAuxC(auxfn.GFAux):
             fout = fout_sE_ctow.split(".")[0] + str(i) + "." + fout_sE_ctow.split(".")[1] 
 
             fmanip.backup_file(fout)
-            green.save_gf_c(fout, w_vec, sEvec_cw)
+            green().save_gf_c(fout, w_vec, sEvec_cw)
 
 

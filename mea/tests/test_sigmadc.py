@@ -8,8 +8,8 @@ import numpy as np
 import os
 import unittest
 
-from ..model import green
-from ..model import periodize
+from ..model.io_triangle import IOTriangle as green
+from ..model.triangle import Triangle
 from ..transport import sigmadc  
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")
@@ -30,9 +30,9 @@ class TestSigmaDC(unittest.TestCase):
         print("\nIn test_sigmadc.\n")
         fin_gf_to = os.path.join(currentdir, "files/self_ctow0_U6.25n0495b12.dat")
         beta = 12.0
-        (w_vec, sEvec_c) = green.read_green_c(fin_gf_to, zn_col=0)
+        (w_vec, sEvec_c) = green().read_green_c(fin_gf_to, zn_col=0)
         mu = 3.1736422868580827
-        model = periodize.Model(1.0, 0.4, mu, w_vec, sEvec_c)
+        model = Triangle(1.0, 0.4, 0.0, mu, w_vec, sEvec_c)
         cls.sdc = sigmadc.SigmaDC(model, beta)
 
 

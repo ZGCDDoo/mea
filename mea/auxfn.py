@@ -11,7 +11,7 @@ from copy import deepcopy
 import os
 from .tools import fmanip
 from .tools import kramerskronig as kk
-from .model import green
+from .model.io_triangle import IOTriangle as green
 from . import acon
 
 
@@ -72,10 +72,10 @@ class GFAux():
 
         # attributes build afterwards by method calls
         # in matsubara freq. (a vector of matrixs, one matrix per matsubara freq.)
-        (self.zn_vec, self.sEvec_c) = green.read_green_c(fin_sE_to, zn_col=0)
+        (self.zn_vec, self.sEvec_c) = green().read_green_c(fin_sE_to, zn_col=0)
         self.II = np.eye(self.sEvec_c.shape[1] ,dtype=complex)
-        self.sEvec_ir = green.c_to_ir(self.sEvec_c) 
-        self.sE_infty = green.read_green_infty(self.sEvec_c)
+        self.sEvec_ir = green().c_to_ir(self.sEvec_c) 
+        self.sE_infty = green().read_green_infty(self.sEvec_c)
 
         
         # attributes build afterwards by method calls.
@@ -119,22 +119,22 @@ class GFAux():
             self.gfvec_aux_c[i] = linalg.inv(zz*self.II - sE + self.sE_infty ) if self.rm_sE_ifty \
                              else linalg.inv(zz*self.II - sE)
 
-        self.gfvec_aux_ir = green.c_to_ir(self.gfvec_aux_c)
+        self.gfvec_aux_ir = green().c_to_ir(self.gfvec_aux_c)
 
         # save the gfvec_aux_ir in a txt file   
          
         fmanip.backup_file(self.fout_gf_aux_to)    
-        green.save_gf_ir(self.fout_gf_aux_to, self.zn_vec, self.gfvec_aux_ir)         
+        green().save_gf_ir(self.fout_gf_aux_to, self.zn_vec, self.gfvec_aux_ir)         
             
         
-    def ac(self, fin_OME_default="OME_default.dat", fin_OME_other="OME_other.dat", 
+    def run_acon(self, fin_OME_default="OME_default.dat", fin_OME_other="OME_other.dat", 
            fin_OME_input="OME_input.dat"):
         """Perform the analytic continuation (acon) to find gf_aux_w on the real 
         frequency axis """
         if self.gfvec_aux_ir is None: self.build_gfvec_aux()
         
         # represent the gfvec_aux_ir as a tabular form of complex numbers without the matsubara grid
-        gf_aux_irt = green.ir_to_t(self.zn_vec, self.gfvec_aux_ir)
+        gf_aux_irt = green().ir_to_t(self.zn_vec, self.gfvec_aux_ir)
 
                   
         self.acon = acon.ACon(gf_aux_irt, self.zn_vec, 
@@ -144,7 +144,7 @@ class GFAux():
                     non_loc_to_conjugate=self.non_loc_to_conjugate, delta=self.delta)
         
         # print("IN gf_aux.acon() \n")
-        self.acon.acon()
+        self.acon.run_acon()
         # print("after gf_aux.acon() \n")
         self.Aw_t_list = deepcopy(self.acon.Aw_t_list)
 
@@ -158,7 +158,7 @@ class GFAux():
                 gfvec_aux_irtw[:, i] = -0.5*(kk.KramersKroning(w_vec, Aw_aux_t[:, i]) + 1.0j*Aw_aux_t[:, i])
             self.gfvec_aux_irtw_list.append(gfvec_aux_irtw)
             self.w_vec_list.append(w_vec)    
-            self.gfvec_aux_irw_list.append(green.t_to_ir(w_vec, gfvec_aux_irtw))
+            self.gfvec_aux_irw_list.append(green().t_to_ir(w_vec, gfvec_aux_irtw))
  
 
         
@@ -182,7 +182,7 @@ class GFAux():
 
          """ 
 
-        gfvec_aux_cw_list = map(green.ir_to_c, deepcopy(self.gfvec_aux_irw_list)) ; w_vec_list = deepcopy(self.w_vec_list)
+        gfvec_aux_cw_list = map(green().ir_to_c, deepcopy(self.gfvec_aux_irw_list)) ; w_vec_list = deepcopy(self.w_vec_list)
         
         if fout_sE_ctow is None: fout_sE_ctow = self.fout_sE_ctow
 
@@ -201,6 +201,6 @@ class GFAux():
             fout = fout_sE_ctow.split(".")[0] + str(i) + "." + fout_sE_ctow.split(".")[1] 
 
             fmanip.backup_file(fout)
-            green.save_gf_c(fout, w_vec, sEvec_cw)
+            green().save_gf_c(fout, w_vec, sEvec_cw)
 
 

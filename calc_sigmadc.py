@@ -1,5 +1,5 @@
-from mea.model import periodize
-from mea.model import green
+from mea.model.triangle import Triangle as Model
+from mea.model.io_triangle import IOTriangle as green
 from mea.transport import sigmadc
 import os, json
 
@@ -15,7 +15,7 @@ for i in range(10):
     if not os.path.isfile(fname):
         break
     
-    (wvec, sEvec_c) = green.read_green_c(fname)
-    model = periodize.Model(1.0, 0.4 , mu, wvec, sEvec_c)
+    (wvec, sEvec_c) = green.()read_green_c(fname)
+    model = Model(1.0, 0.4 , mu, wvec, sEvec_c)
     sdc = sigmadc.SigmaDC(model, beta=beta)
     sdc.calc_sigmadc()

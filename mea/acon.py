@@ -204,7 +204,7 @@ class ACon():
         return Aw_t.copy()
 
 
-    def acon(self):
+    def run_acon(self):
         """Perform the analytic continuation (acon) to find gf_t on the real frequency axis """
         # Note the abbreviation: OME = OmegaMaxEnt
         self.build_gf_aux_t() ; gf_aux_t = np.copy(self.gf_aux_t)

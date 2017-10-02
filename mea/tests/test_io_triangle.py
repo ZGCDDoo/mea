@@ -7,12 +7,12 @@ To lighten the writing we supress the "vec". The same goes for the sE.
 import numpy as np
 import os
 import unittest
-from ..model import green
+from ..model.io_triangle import IOTriangle as green
 
 currentdir = os.path.join(os.getcwd(), "mea/tests")
 
 
-class TestGreen(unittest.TestCase):
+class TestIOTriangle(unittest.TestCase):
     """ A class that implements tests for the Auxiliary green function class. If input is given 
         as a gf file of a cluster, then it builds an auxiliary GF (it can do so
         for real or complex frequencies. However, imaginary frequencies is implicit).
@@ -22,13 +22,13 @@ class TestGreen(unittest.TestCase):
     
     @classmethod
     def setUpClass(self):
-        print("\nIn test green.\n")
+        print("\nIn test io_triangle.\n")
         print("currentdir = ", currentdir, "\n")
     
     def test_read_green_c(self):
         """ """
         fin_gf_to = os.path.join(currentdir, "files/self_short_moy.dat") 
-        (zn, gf_c) = green.read_green_c(fin_gf_to, zn_col=0)
+        (zn, gf_c) = green().read_green_c(fin_gf_to, zn_col=0)
         
         zn_test = np.array([5.235989e-002, 1.570800e-001, 2.6179900e-001, 1.5027299e+001])
         
@@ -56,8 +56,8 @@ class TestGreen(unittest.TestCase):
                         ]
                             ])
                                   
-        gf_c_test = green.t_to_c(zn, gf_t)
-        gf_t_test = green.c_to_t(zn, gf_c_test)
+        gf_c_test = green().t_to_c(zn, gf_t)
+        gf_t_test = green().c_to_t(zn, gf_c_test)
       
         try:
             np.testing.assert_allclose(gf_c, gf_c_test, rtol=1e-7, atol=1e-7)
@@ -95,8 +95,8 @@ class TestGreen(unittest.TestCase):
     def test_read_gf_infty(self):
         """ """
         fin_gf_to = os.path.join(currentdir, "files/self_short_moy.dat") 
-        (zn, gf_c) = green.read_green_c(fin_gf_to, 0)
-        gf_infty = green.read_green_infty(gf_c)
+        (zn, gf_c) = green().read_green_c(fin_gf_to, 0)
+        gf_infty = green().read_green_infty(gf_c)
         gf_test_infty = gf_c[-1, :, :]
 
         try:
@@ -107,13 +107,13 @@ class TestGreen(unittest.TestCase):
  
     def test_t_to_c(self):
         fin_gf_to = os.path.join(currentdir,"files/self_moy.dat")
-        (zn, gf_c) = green.read_green_c(fin_gf_to, 0)
+        (zn, gf_c) = green().read_green_c(fin_gf_to, 0)
 
-        gf_to_test = green.c_to_to(zn, gf_c)
-        gf_t_test = green.c_to_t(zn, gf_c)
+        gf_to_test = green().c_to_to(zn, gf_c)
+        gf_t_test = green().c_to_t(zn, gf_c)
         
-        gf_test1_c = green.to_to_c(zn, gf_to_test)
-        gf_test2_c = green.t_to_c(zn, gf_t_test)
+        gf_test1_c = green().to_to_c(zn, gf_to_test)
+        gf_test2_c = green().t_to_c(zn, gf_t_test)
 
         try:
             np.testing.assert_allclose(gf_c, gf_test1_c, rtol=1e-7, atol=1e-7)
@@ -125,11 +125,11 @@ class TestGreen(unittest.TestCase):
     def test_c_to_ir(self):
         """ """
         fin_gf_to = os.path.join(currentdir,"files/self_moy.dat")
-        (zn, gf_c) = green.read_green_c(fin_gf_to, 0)
+        (zn, gf_c) = green().read_green_c(fin_gf_to, 0)
 
         # test to see if going from c_to_ir and back gives the same thing
-        gf_ir = green.c_to_ir(gf_c)
-        gf_c_test = green.ir_to_c(gf_ir)
+        gf_ir = green().c_to_ir(gf_c)
+        gf_c_test = green().ir_to_c(gf_ir)
         
         gf_ir_test = np.zeros(gf_c.shape, dtype=complex)
         gf_ir_test[:, 0, 0] = gf_c[:, 0, 0] + gf_c[:, 0 ,2]
@@ -167,15 +167,15 @@ class TestGreen(unittest.TestCase):
         """test t_to_ir, to_to_ir and ir_to_to"""
     
         fin_gf_to = os.path.join(currentdir,"files/self_moy.dat")
-        (zn, gf_c) = green.read_green_c(fin_gf_to, 0)
+        (zn, gf_c) = green().read_green_c(fin_gf_to, 0)
 
         # test to see if going from c_to_ir and back gives the same thing
-        gf_ir = green.c_to_ir(gf_c)    
-        gf_t = green.ir_to_t(zn, gf_ir)
-        gf_to = green.ir_to_to(zn, gf_ir)
-        gf_ir_test = green.to_to_ir(zn, gf_to)
-        gf_t_test = green.to_to_t(gf_to)
-        gf_ir_test2 = green.t_to_ir(zn, gf_t)
+        gf_ir = green().c_to_ir(gf_c)    
+        gf_t = green().ir_to_t(zn, gf_ir)
+        gf_to = green().ir_to_to(zn, gf_ir)
+        gf_ir_test = green().to_to_ir(zn, gf_to)
+        gf_t_test = green().to_to_t(gf_to)
+        gf_ir_test2 = green().t_to_ir(zn, gf_t)
         
         try:
             np.testing.assert_allclose(gf_ir, gf_ir_test, rtol=1e-7, atol=1e-7)

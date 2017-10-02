@@ -69,14 +69,14 @@ class TestGFAuxSC(unittest.TestCase):
             self.fail("Problem at test_build_gfvec_aux")
 
 
-    def test_ac(self):
+    def test_run_acon(self):
         """ """
         #pass
         fin_sE_to = os.path.join(currentdir, "files/self_moy_sc_b60tp04n0495U6500.dat")
         gf_aux = auxfnsc.GFAuxSC(fin_sE_to=fin_sE_to, rm_sE_ifty=False)
         gf_aux.build_gfvec_aux()
         
-        gf_aux.ac(fin_OME_default=os.path.join(currentdir, "files/OME_default.dat"), \
+        gf_aux.run_acon(fin_OME_default=os.path.join(currentdir, "files/OME_default.dat"), \
                   fin_OME_other=os.path.join(currentdir, "files/OME_other.dat"), \
                   fin_OME_input=os.path.join(currentdir, "files/OME_input_test.dat")
                   )

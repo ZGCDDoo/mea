@@ -147,7 +147,7 @@ class TestAcon(unittest.TestCase):
             self.fail("error at build_gf_aux") 
 
         
-    def test_acon(self):
+    def test_run_acon(self):
         """ """
         
  
@@ -168,7 +168,7 @@ class TestAcon(unittest.TestCase):
         # print("gf_t.shape == ", gf_t.shape)
         #print("In tests acon ... \n\n\n\n")
         ac = acon.ACon(gf_t, zn_vec, loc=[0,1], non_loc=[], non_loc_sign=[], non_loc_to_conjugate=[], fin_OME_default=fin_OME_default, fin_OME_input=fin_OME_input, fin_OME_other=fin_OME_other)
-        ac.acon()
+        ac.run_acon()
         
         Aw_t_good0 = np.loadtxt(os.path.join(currentdir, "files/Aw_test_acon0.dat"))
         w_vec0 = Aw_t_good0[:, 0]
