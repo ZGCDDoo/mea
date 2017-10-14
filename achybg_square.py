@@ -7,6 +7,8 @@ from mea.tools import kramerskronig as kk
 from copy import deepcopy
 import json
 import sys
+import os
+
 
 iter_start = int(sys.argv[1])
 iter_end = int(sys.argv[2])
@@ -20,25 +22,26 @@ with open("statsparams0.json") as fin:
     #tpp = params_fin["tpp"][0]
 
 
-fname_hyb = "Hyb" + str(iter_start) + ".json"
-
+fname_hyb = os.path.join("..", "Hyb" + str(iter_start) + ".json")
 with open(fname_hyb) as fin:
     params_fin = json.load(fin)
     hybvec = np.array(params_fin["0Pi"]["real"], dtype=complex) + 1.0j*np.array(params_fin["0Pi"]["imag"], dtype=complex )
 
-fname_self = "Self" + str(iter_start) + ".json"
+
+fname_self = os.path.join("..", "Self" + str(iter_start) + ".json")
 with open(fname_self) as fin:
     params_fin = json.load(fin)
     selfvec = np.array(params_fin["0Pi"]["real"], dtype=complex) + 1.0j*np.array(params_fin["0Pi"]["imag"], dtype=complex)
 
 for ii in range(iter_start + 1, iter_end + 1):
-    fname_hyb = "Hyb" + str(ii) + ".json"
 
+    fname_hyb = os.path.join("..", "Hyb" + str(ii) + ".json")
     with open(fname_hyb) as fin:
         params_fin = json.load(fin)
         hybvec += np.array(params_fin["0Pi"]["real"]) + 1.0j*np.array(params_fin["0Pi"]["imag"] )
 
-    fname_self = "Self" + str(ii) + ".json"
+
+    fname_self = os.path.join("..", "Self" + str(ii) + ".json")
     with open(fname_self) as fin:
         params_fin = json.load(fin)
         selfvec += np.array(params_fin["0Pi"]["real"], dtype=complex) + 1.0j*np.array(params_fin["0Pi"]["imag"], dtype=complex)
