@@ -7,6 +7,9 @@ from scipy.integrate import dblquad
 
 
 #Copyright Charles-David Hebert
+#MIT Licencse, use it as you see fit, but please give retributions to the author.
+
+
 class ModelNambu: 
     """ """
     def __init__(self, t: float, tp: float, tpp:float, mu: float, z_vec, sEvec_c) -> None:
@@ -89,7 +92,7 @@ class ModelNambu:
         exQ = np.exp(1.0j*(kx+np.pi))
         eyQ = np.exp(1.0j*(ky+np.pi))
         vk = np.array([1.0, ex, ex*ey, ey], dtype=complex)
-        vkQ = np.array([1.0, exQ, exQ*eyQ, eyQ])
+        vkQ = np.array([1.0, exQ, exQ*eyQ, eyQ], dtype=complex)
         nambu_periodized = np.zeros((4, 4), dtype=complex)
 
         gup = arg[:4:, :4:]
@@ -99,13 +102,14 @@ class ModelNambu:
 
         llgreen = [gup, ff, gdown, ffdag]
 
-        llperiodized = []
+        llperiodized = [None]*4
         for ii in range(4):
-            llperiodized.append(  np.array([
-                                    [np.dot(np.conjugate(v1), np.dot(llgreen[i], v1)), np.dot(np.conjugate(vk), np.dot(llgreen[i], vkQ))]
-                                    [np.dot(np.conjugate(vkQ), np.dot(llgreen[i], vk)), np.dot(np.conjugate(vkQ), np.dot(llgreen[i], vkQ))]
-                                                ], dtype=complex)
-                                )
+            llperiodized[ii] =   np.array([
+                                    [np.dot(np.conjugate(vk), np.dot(llgreen[ii], vk)), np.dot(np.conjugate(vk), np.dot(llgreen[ii], vkQ))]
+                                    [np.dot(np.conjugate(vkQ), np.dot(llgreen[ii], vk)), np.dot(np.conjugate(vkQ), np.dot(llgreen[ii], vkQ))]
+                                        ], 
+                                    dtype=complex)
+                                
 
         nambu_periodized[:2:, :2:] = llperiodized[0]
         nambu_periodized[:2:, 2::] = llperiodized[1]
@@ -125,13 +129,18 @@ class ModelNambu:
     def stiffness(self, kx: float, ky: float, ii: int) -> float:
         """ """
         nambu_periodized = self.periodize(kx, ky, self.build_gf_ktilde(kx, ky, ii)) #self.periodize_nambu(kx, ky, ii)
-        #coskx: float = np.cos(kx) 
-        #cosky: float = np.cos(ky)
-        #tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
-        #tperp_squared = tperp*tperp
-        #N_c = 4.0
-        tperp_squared = 2.0
-        return (-1.0 * np.real(-4.0*tperp_squared*nambu_periodized[0, 1]*nambu_periodized[1, 0]))
+        coskx: float = np.cos(kx) 
+        cosky: float = np.cos(ky)
+        tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
+        tperp_squared = 2.0*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)
+        return (-1.0 * np.real(-tperp_squared*
+                                (np.abs(nambu_periodized[0, 2])**2.0 + np.abs(nambu_periodized[2, 0])**2.0 +
+                                 2.0*(np.abs(nambu_periodized[0, 3])**2.0 + np.abs(nambu_periodized[3, 0])**2.0) +
+                                 np.abs(nambu_periodized[1, 3])**2.0 + np.abs(nambu_periodized[3, 1])**2.0
+                                )
+
+                             )
+                )
 
 
     def periodize_cumulant(self, kx: float, ky: float, ii: int): # cumulant periodization
@@ -146,19 +155,26 @@ class ModelNambu:
         """ """
         
         nambu_periodized = self.periodize_cumulant(kx, ky, ii) #linalg.inv(tmp.copy())
-        #coskx: float = np.cos(kx) 
-        #cosky: float = np.cos(ky)
-        #tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
-        #tperp_squared = tperp*tperp
-        #N_c = 4.0
-        tperp_squared = 2.0
-        return (-1.0 * np.real(-4.0*tperp_squared*nambu_periodized[0, 1]*nambu_periodized[1, 0]))    
+        coskx: float = np.cos(kx) 
+        cosky: float = np.cos(ky)
+        tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
+        tperp_squared = 2.0*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)
+        return (-1.0 * np.real(-tperp_squared*
+                                (np.abs(nambu_periodized[0, 2])**2.0 + np.abs(nambu_periodized[2, 0])**2.0 +
+                                 2.0*(np.abs(nambu_periodized[0, 3])**2.0 + np.abs(nambu_periodized[3, 0])**2.0) +
+                                 np.abs(nambu_periodized[1, 3])**2.0 + np.abs(nambu_periodized[3, 1])**2.0
+                                )
+
+                             )
+                )   
 
     def stiffness_trace(self, kx: float, ky: float, ii: int) -> float:
         """4/N_c Trace(F F^Dag) """
         gf_ktilde = self.build_gf_ktilde(kx, ky, ii)
-        trace = np.trace(np.dot(gf_ktilde[:4:, 4::], gf_ktilde[4::, :4:]))    
-        tperp_squared = 2.0
+        trace = np.trace(np.dot(gf_ktilde[:4:, 4::], gf_ktilde[4::, :4:]))
+        coskx: float = np.cos(kx) 
+        cosky: float = np.cos(ky)
+        tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
+        tperp_squared = 2.0*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)    
         return (tperp_squared*np.real(trace))
-   
 
