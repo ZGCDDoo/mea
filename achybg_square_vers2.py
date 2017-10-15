@@ -86,10 +86,7 @@ acgf = acon.ACon(gfaux[:, np.newaxis], znvec); acgf.run_acon()
 shutil.move("Result_OME", "Result_OME_gfaux")
 
 
-Aw_t_list_hyb = deepcopy(achyb.Aw_t_list)
-Aw_t_list_gf = deepcopy(acgf.Aw_t_list)
-hybvec_w_list = []; hybvec_w_list = []
-gfvec_w_list = []; gfvec_w_list = []
+hybvec_w_list = []; gfvec_w_list = []
 w_vec_list = []
 
 
@@ -117,7 +114,7 @@ for (n, (gfvec_w, w_vec)) in enumerate(zip(gfvec_w_list, w_vec_list)):
     if gfvec_w is None or hybvec_w_list[n] is None:
         continue
     else:
-        selfvec_w = -1.0/gfvec_w + w_vec + mu + hybvec_w_list[n]
+        selfvec_w = -1.0/gfvec_w + w_vec + mu - hybvec_w_list[n]
         fname = "self_w" + str(n) + ".dat"
         np.savetxt(fname, np.transpose([w_vec, selfvec_w.real, selfvec_w.imag]))
 
