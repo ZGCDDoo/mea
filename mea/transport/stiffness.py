@@ -16,7 +16,7 @@ def stiffness(fname, param_name="U"):
     beta = params["beta"][0]
     tp = params["tp"][0]
     U = params[param_name][0]
-    stiffness = 0.0
+    stiffness_green = 0.0
     stiffness_cum = 0.0
     stiffness_trace = 0.0
 
@@ -26,7 +26,7 @@ def stiffness(fname, param_name="U"):
 
     N_c = 4.0
     for ii in range(zn_vec.shape[0]):
-        stiffness += 2.0/beta*1.0/(2.0*np.pi)**2*dblquad(model_sc.stiffness, -np.pi, np.pi, Y1, Y2, args=(ii,) )[0]
+        stiffness_green += 2.0/beta*1.0/(2.0*np.pi)**2*dblquad(model_sc.stiffness, -np.pi, np.pi, Y1, Y2, args=(ii,) )[0]
         stiffness_cum += 2.0/beta*1.0/(2.0*np.pi)**2*dblquad(model_sc.stiffness_cum, -np.pi, np.pi, Y1, Y2, args=(ii,) )[0]
         stiffness_trace += 2.0/beta*N_c/(2.0*np.pi)**2*dblquad(model_sc.stiffness_trace, -np.pi/2.0, np.pi/2.0, 
                                                                 lambda x: -np.pi/2.0, lambda x: np.pi/2.0, args=(ii,) )[0]
@@ -36,8 +36,8 @@ def stiffness(fname, param_name="U"):
     #print("stiffness = ", stiffness)
     #print("\nstiffness_cum = ", stiffness_cum)
     fmanip.backup_file("stiffness.dat")
-    np.savetxt("stiffness.dat", np.array([[stiffness, stiffness_cum, stiffness_trace]]))
-    return (U, stiffness, stiffness_cum, stiffness_trace)
+    np.savetxt("stiffness.dat", np.array([[stiffness_green, stiffness_cum, stiffness_trace]]))
+    return (U, stiffness_green, stiffness_cum, stiffness_trace)
 
 
 def stiff_walk(fname="self_moy.dat", param_name="U"):

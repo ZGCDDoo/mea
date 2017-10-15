@@ -3,16 +3,23 @@ from scipy import linalg
 from scipy.integrate import dblquad
 
 
+#For Olivier and qcm
+
+
+#Copyright Charles-David Hebert
+#MIT Licencse, use it as you see fit, but please give retributions to the author.
+
 
 class ModelNambu: 
     """ """
-    def __init__(self, t: float, tp: float, mu: float, z_vec, sEvec_c) -> None:
+    def __init__(self, t: float, tp: float, tpp:float, mu: float, z_vec, sEvec_c) -> None:
         """ """
 
-        self.t = t ; self.tp = tp; self.mu = mu ; 
+        self.t = t ; self.tp = tp; self.tpp = tpp; self.mu = mu ; 
         self.z_vec = z_vec ; self.sEvec_c = sEvec_c
         self.cumulants = self.build_cumulants()
         return None
+
 
 
     def t_value(self, kx: float, ky: float): # This is t_ij(k_tilde)
@@ -41,6 +48,7 @@ class ModelNambu:
         t_val = np.concatenate((tmp1, tmp2), axis=1)
         
         return (t_val)
+
 
 
 
@@ -83,41 +91,39 @@ class ModelNambu:
         return np.pi        
 
 
-    
-    def Akw_trace(self, kx: float, ky: float, ii: int):
-        """ """
-        gf_ktilde = self.build_gf_ktilde(kx, ky, ii)
-        Akw = -2.0*np.trace(gf_ktilde).imag
-        return (Akw / 4.0)
-
-
-    def dos_with_trace(self, fout_name="dos_trace_nambu.dat"):
-        """ """
-        len_sEvec_c: int = self.sEvec_c.shape[0]
-        dos = np.zeros(len_sEvec_c)
-        for n in range(len_sEvec_c):
-            print("IN LOOP of dos # ", n, " out of ", len_sEvec_c, "\n")
-            dos[n] = (2.0*np.pi)**(-2.0)*dblquad(self.Akw_trace, -np.pi, np.pi, self.Y1Limit, self.Y2Limit, args=(n,))[0]
-        dos_out = np.transpose([self.z_vec, dos])
-        np.savetxt(fout_name, dos_out)
-        return dos
-
 
     def periodize(self, kx: float, ky: float, arg):
         """ """
         
         ex = np.exp(1.0j*kx)
         ey = np.exp(1.0j*ky)
-        v = np.array([1., ex, ex*ey, ey], dtype=complex)
-        nambu_periodized = np.zeros((2, 2), dtype=complex)
+        exQ = np.exp(1.0j*(kx+np.pi))
+        eyQ = np.exp(1.0j*(ky+np.pi))
+        vk = np.array([1.0, ex, ex*ey, ey], dtype=complex)
+        vkQ = np.array([1.0, exQ, exQ*eyQ, eyQ], dtype=complex)
+        nambu_periodized = np.zeros((4, 4), dtype=complex)
 
-        for  i in range(4):
-            for j in range(4):
-                nambu_periodized[0, 0] += np.conj(v[i])*arg[i, j]*v[j]
-                nambu_periodized[0, 1] += np.conj(v[i])*arg[i, j + 4]*v[j]
-                nambu_periodized[1, 0] += np.conj(v[i])*arg[i + 4, j]*v[j]
-                nambu_periodized[1, 1] += np.conj(v[i])*arg[i + 4, j + 4]*v[j]
-        
+        gup = arg[:4:, :4:]
+        gdown = arg[4::, 4::]
+        ff = arg[:4:, 4::]
+        ffdag = arg[4::, :4:]
+
+        llgreen = [gup, ff, gdown, ffdag]
+
+        llperiodized = [None]*4
+        for ii in range(4):
+            llperiodized[ii] =   np.array([
+                                    [np.dot(np.conjugate(vk), np.dot(llgreen[ii], vk)), np.dot(np.conjugate(vk), np.dot(llgreen[ii], vkQ))],
+                                    [np.dot(np.conjugate(vkQ), np.dot(llgreen[ii], vk)), np.dot(np.conjugate(vkQ), np.dot(llgreen[ii], vkQ))]
+                                        ], 
+                                    dtype=complex)
+                                
+
+        nambu_periodized[:2:, :2:] = llperiodized[0]
+        nambu_periodized[:2:, 2::] = llperiodized[1]
+        nambu_periodized[2::, 2::] = llperiodized[2]
+        nambu_periodized[2::, :2:] = llperiodized[3]
+
         return (0.25*nambu_periodized)
 
 
@@ -134,17 +140,27 @@ class ModelNambu:
         #coskx: float = np.cos(kx) 
         #cosky: float = np.cos(ky)
         #tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
-        #tperp_squared = tperp*tperp
-        #N_c = 4.0
-        tperp_squared = 2.0
-        return (-1.0 * np.real(-4.0*tperp_squared*nambu_periodized[0, 1]*nambu_periodized[1, 0]))
+        tperp_squared = 2.0#*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)
+        return (-1.0 * np.real(-tperp_squared*
+                                (2.0*nambu_periodized[0, 2]*nambu_periodized[2, 0] +
+                                 0.0*(nambu_periodized[0, 3]*nambu_periodized[3, 0]) +
+                                 2.0*nambu_periodized[1, 3]*nambu_periodized[3, 1]
+                                )
 
+                             )
+                )
+
+
+    def eps0(self, kx, ky):
+        return (-2.0*self.t*(np.cos(kx) + np.cos(ky)) - 2.0*self.tp*np.cos(kx + ky) )
 
     def periodize_cumulant(self, kx: float, ky: float, ii: int): # cumulant periodization
         """ """
         tmp = linalg.inv(self.periodize(kx, ky, self.cumulants[ii]))
-        eps = -2.0*self.t*(np.cos(kx) + np.cos(ky)) - 2.0*self.tp*np.cos(kx + ky)
-        tmp[0, 0] -= eps; tmp[1, 1] += eps
+        
+        tmp[0, 0] -= self.eps0(kx, ky); tmp[1, 1] -= self.eps0(kx+np.pi, ky+np.pi)
+        tmp[2, 2] += self.eps0(kx, ky); tmp[3, 3] += self.eps0(kx+np.pi, ky+np.pi)
+        
         return linalg.inv(tmp)
 
 
@@ -155,33 +171,23 @@ class ModelNambu:
         #coskx: float = np.cos(kx) 
         #cosky: float = np.cos(ky)
         #tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
-        #tperp_squared = tperp*tperp
-        #N_c = 4.0
-        tperp_squared = 2.0
-        return (-1.0 * np.real(-4.0*tperp_squared*nambu_periodized[0, 1]*nambu_periodized[1, 0]))    
+        tperp_squared = 2.0#*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)
+        return (-1.0 * np.real(-tperp_squared*
+                                (2.0*nambu_periodized[0, 2]*nambu_periodized[2, 0] +
+                                 0.0*nambu_periodized[0, 3]*nambu_periodized[3, 0] +
+                                 2.0*nambu_periodized[1, 3]*nambu_periodized[3, 1]
+                                )
+
+                             )
+                )   
 
     def stiffness_trace(self, kx: float, ky: float, ii: int) -> float:
         """4/N_c Trace(F F^Dag) """
         gf_ktilde = self.build_gf_ktilde(kx, ky, ii)
-        trace = np.trace(np.dot(gf_ktilde[:4:, 4::], gf_ktilde[4::, :4:]))    
-        tperp_squared = 2.0
+        trace = np.trace(np.dot(gf_ktilde[:4:, 4::], gf_ktilde[4::, :4:]))
+        #coskx: float = np.cos(kx) 
+        #cosky: float = np.cos(ky)
+        #tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
+        tperp_squared = 2.0#*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)    
         return (tperp_squared*np.real(trace))
-    
-    def matsubara_surface(self, fout: str ="matsubara_surface.dat"):
-        """Plot the norm of the gorkov function as a function of kx, ky."""
-        
-        kxarr = np.linspace(-np.pi, np.pi, 100)
-        kyarr = kxarr.copy()
-        Akz_vec = np.zeros((kxarr.shape[0]*kyarr.shape[0], 3))
-
-        idx: int = 0
-        for (i, kx) in enumerate(kxarr):
-            for(j, ky) in enumerate(kyarr):
-                Akz_vec[idx, 0] += kx
-                Akz_vec[idx, 1] += ky
-                Akz_vec[idx, 2] += np.absolute(self.periodize_nambu(kx, ky, idx)[0, 1])
-                idx+=1
-
-        np.savetxt(fout, Akz_vec)
-
 
