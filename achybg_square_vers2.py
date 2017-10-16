@@ -97,7 +97,7 @@ def extract_selfw(w_vec_list, hybvec_w_list, gfvec_w_list, mu):
     return None
 
 
-def main(iter_start, iter_end):
+def main(iter_start, iter_end, N):
 
     beta = extract_parameter_bqsubmit("bqsubmit.dat", 'beta')
     t = 1.0
@@ -126,6 +126,7 @@ def main(iter_start, iter_end):
 
 
 def correct_selfw(mu, fnamehyb, fnamegf):
+    
     Awhyb = np.loadtxt(fnamehyb)
     w_vec = Awhyb[:, 0]
     hybvec_w = -0.5*(kk.KramersKroning(w_vec, Awhyb[:,1]) + 1.0j*Awhyb[:,1])
@@ -137,10 +138,20 @@ def correct_selfw(mu, fnamehyb, fnamegf):
     np.savetxt("self_w_corrected.dat", np.transpose([w_vec, selfvec_w.real, selfvec_w.imag]))
     return None
 
+def correct_all(mu):
+
+    for ii in range(10):
+        fnamehyb = os.path.join("Result_OME_hyb", os.path.join(str(ii),  "Aw_t.dat"))
+        fnamegf = os.path.join("Result_OME_gfaux", os.path.join(str(ii), "Aw_t.dat"))
+        if not os.path.isfile(fnamegf):
+            break
+        correct_selfw(mu, fnamehyb, fnamegf)
+        shutil.move("self_w_corrected.dat", "self_w_corrected" + str(ii) + ".dat")
+
 
 if __name__ == "__main__":
 
     iter_start = int(sys.argv[1])
     iter_end = int(sys.argv[2])
     N = sys.argv[3]
-    main(iter_start, iter_end)
+    main(iter_start, iter_end, N)
