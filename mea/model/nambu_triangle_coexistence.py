@@ -143,7 +143,7 @@ class ModelNambu:
         tperp_squared = 2.0#*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)
         return (-1.0 * np.real(-tperp_squared*
                                 (2.0*nambu_periodized[0, 2]*nambu_periodized[2, 0] +
-                                 0.0*(nambu_periodized[0, 3]*nambu_periodized[3, 0]) +
+                                 4.0*(nambu_periodized[0, 3]*nambu_periodized[3, 0]) +
                                  2.0*nambu_periodized[1, 3]*nambu_periodized[3, 1]
                                 )
 
@@ -174,7 +174,7 @@ class ModelNambu:
         tperp_squared = 2.0#*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)
         return (-1.0 * np.real(-tperp_squared*
                                 (2.0*nambu_periodized[0, 2]*nambu_periodized[2, 0] +
-                                 0.0*nambu_periodized[0, 3]*nambu_periodized[3, 0] +
+                                 4.0*nambu_periodized[0, 3]*nambu_periodized[3, 0] +
                                  2.0*nambu_periodized[1, 3]*nambu_periodized[3, 1]
                                 )
 

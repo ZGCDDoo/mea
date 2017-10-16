@@ -21,6 +21,7 @@ class ModelNambu:
         return None
 
 
+
     def t_value(self, kx: float, ky: float) : # This is t_ij(k_tilde)
         """this t_value is only good if tpp = 0.0"""
         t = self.t ; tp = self.tp; tpp = self.tpp
@@ -48,6 +49,7 @@ class ModelNambu:
         t_val = np.concatenate((tmp1, tmp2), axis=1)
 
         return (t_val)
+
 
 
 
@@ -136,25 +138,30 @@ class ModelNambu:
     def stiffness(self, kx: float, ky: float, ii: int) -> float:
         """ """
         nambu_periodized = self.periodize(kx, ky, self.build_gf_ktilde(kx, ky, ii)) #self.periodize_nambu(kx, ky, ii)
-        coskx: float = np.cos(kx) 
-        cosky: float = np.cos(ky)
-        tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
-        tperp_squared = 2.0*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)
+        #coskx: float = np.cos(kx) 
+        #cosky: float = np.cos(ky)
+        #tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
+        tperp_squared = 2.0#*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)
         return (-1.0 * np.real(-tperp_squared*
-                                (#np.abs(nambu_periodized[0, 2])**2.0 + np.abs(nambu_periodized[2, 0])**2.0 +
-                                 0.0*(np.abs(nambu_periodized[0, 3])**2.0 + np.abs(nambu_periodized[3, 0])**2.0) +
-                                 np.abs(nambu_periodized[1, 3])**2.0 + np.abs(nambu_periodized[3, 1])**2.0
+                                (2.0*nambu_periodized[0, 2]*nambu_periodized[2, 0] +
+                                 4.0*(nambu_periodized[0, 3]*nambu_periodized[3, 0]) +
+                                 2.0*nambu_periodized[1, 3]*nambu_periodized[3, 1]
                                 )
 
                              )
                 )
 
 
+    def eps0(self, kx, ky):
+        return (-2.0*self.t*(np.cos(kx) + np.cos(ky)) - 2.0*self.tp*np.cos(kx + ky) )
+
     def periodize_cumulant(self, kx: float, ky: float, ii: int): # cumulant periodization
         """ """
         tmp = linalg.inv(self.periodize(kx, ky, self.cumulants[ii]))
-        eps = -2.0*self.t*(np.cos(kx) + np.cos(ky)) - 2.0*self.tp*np.cos(kx + ky)
-        tmp[0, 0] -= eps; tmp[1, 1] += eps
+        
+        tmp[0, 0] -= self.eps0(kx, ky); tmp[1, 1] -= self.eps0(kx+np.pi, ky+np.pi)
+        tmp[2, 2] += self.eps0(kx, ky); tmp[3, 3] += self.eps0(kx+np.pi, ky+np.pi)
+        
         return linalg.inv(tmp)
 
 
@@ -162,14 +169,14 @@ class ModelNambu:
         """ """
         
         nambu_periodized = self.periodize_cumulant(kx, ky, ii) #linalg.inv(tmp.copy())
-        coskx: float = np.cos(kx) 
-        cosky: float = np.cos(ky)
-        tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
-        tperp_squared = 2.0*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)
+        #coskx: float = np.cos(kx) 
+        #cosky: float = np.cos(ky)
+        #tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
+        tperp_squared = 2.0#*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)
         return (-1.0 * np.real(-tperp_squared*
-                                (#np.abs(nambu_periodized[0, 2])**2.0 + np.abs(nambu_periodized[2, 0])**2.0 +
-                                 0.0*(np.abs(nambu_periodized[0, 3])**2.0 + np.abs(nambu_periodized[3, 0])**2.0) +
-                                 np.abs(nambu_periodized[1, 3])**2.0 + np.abs(nambu_periodized[3, 1])**2.0
+                                (2.0*nambu_periodized[0, 2]*nambu_periodized[2, 0] +
+                                 4.0*nambu_periodized[0, 3]*nambu_periodized[3, 0] +
+                                 2.0*nambu_periodized[1, 3]*nambu_periodized[3, 1]
                                 )
 
                              )
@@ -179,9 +186,9 @@ class ModelNambu:
         """4/N_c Trace(F F^Dag) """
         gf_ktilde = self.build_gf_ktilde(kx, ky, ii)
         trace = np.trace(np.dot(gf_ktilde[:4:, 4::], gf_ktilde[4::, :4:]))
-        coskx: float = np.cos(kx) 
-        cosky: float = np.cos(ky)
-        tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
-        tperp_squared = 2.0*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)    
+        #coskx: float = np.cos(kx) 
+        #cosky: float = np.cos(ky)
+        #tperp = -(coskx - cosky)*(coskx - cosky) # t_perp = -1.0
+        tperp_squared = 2.0#*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)    
         return (tperp_squared*np.real(trace))
 
