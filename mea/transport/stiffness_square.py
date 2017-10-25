@@ -19,26 +19,23 @@ def stiffness(model_sc):
     Y2 = model_sc.Y2Limit
 
     N_c = 4.0
-    stiff_test = 0.0
-    stiff_test_orbital = 0.0
     beta = 60.0
     for ii in range(ss):
         stiffness_green_arr[ii] = 2.0/(2.0*np.pi)**2*dblquad(model_sc.stiffness, -np.pi, np.pi, Y1, Y2, args=(ii,) )[0]
         stiffness_green_orbital_arr[ii] = 2.0/(2.0*np.pi)**2*dblquad(model_sc.stiffness_orbital, -np.pi, np.pi, Y1, Y2, args=(ii,) )[0]
-        stiff_test += stiffness_green_arr[ii]/beta
-        stiff_test_orbital += stiffness_green_orbital_arr[ii]/beta
-        #stiffness_cum_arr[ii] = 2.0/(2.0*np.pi)**2*dblquad(model_sc.stiffness_cum, -np.pi, np.pi, Y1, Y2, args=(ii,) )[0]
-        #stiffness_trace_arr[ii] = 2.0*N_c/(2.0*np.pi)**2*dblquad(model_sc.stiffness_trace, -np.pi/2.0, np.pi/2.0, 
-                                                                #lambda x: -np.pi/2.0, lambda x: np.pi/2.0, args=(ii,) )[0]
+        stiffness_cum_arr[ii] = 2.0/(2.0*np.pi)**2*dblquad(model_sc.stiffness_cum, -np.pi, np.pi, Y1, Y2, args=(ii,) )[0]
+        stiffness_trace_arr[ii] = 2.0*N_c/(2.0*np.pi)**2*dblquad(model_sc.stiffness_trace, -np.pi/2.0, np.pi/2.0, 
+                                                                lambda x: -np.pi/2.0, lambda x: np.pi/2.0, args=(ii,) )[0]
 
 
     stiffness_green = 1.0/(2.0*np.pi)*simps(stiffness_green_arr, model_sc.z_vec.imag)
     stiffness_cum =  1.0/(2.0*np.pi)*simps(stiffness_cum_arr, model_sc.z_vec.imag)
     stiffness_trace = 1.0/(2.0*np.pi)*simps(stiffness_trace_arr, model_sc.z_vec.imag)
 
+    stiffness_green_orbital  = 1.0/(2.0*np.pi)*simps(stiffness_green_orbital_arr, model_sc.z_vec.imag)
+    
     print("sum_green = ", np.sum(1.0/beta*stiffness_green_arr))
-    print("stiff_green_test = ", stiff_test)
-    print("stiff_green_orbital_test = ", stiff_test_orbital)
+    print("stiff_green_orbital = ", np.sum(1.0/beta*stiffness_green_orbital_arr))
     print("sum_trace = ", np.sum(1.0/beta*stiffness_trace_arr))
     print("sum_cum = ", np.sum(1.0/beta*stiffness_cum_arr))
 

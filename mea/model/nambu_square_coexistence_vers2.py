@@ -29,8 +29,8 @@ class ModelNambu:
         ex = np.exp(-2.0j*kx) ; emx = np.conjugate(ex)
         ey = np.exp(-2.0j*ky) ; emy = np.conjugate(ey)
         tloc = np.array([[0.0, -t, -t, -tp],
-                         [-t, 0.0, 0.0, -t],
-                         [-t, 0.0, 0.0, -t],
+                         [-t, 0.0, -tp, -t],
+                         [-t, -tp, 0.0, -t],
                          [-tp, -t, -t, 0.0]])
 
 
@@ -130,10 +130,12 @@ class ModelNambu:
 
     def periodize_orbitale(self, kx: float, ky: float, arg):
         
-        r1 = np.array([0.0, 0.0])
-        r2 = np.array([0.0, 1.0])
         ex = np.exp(1.0j*kx)
-        vk = np.array([1.0, ex], dtype=complex)
+        ey = np.exp(1.0j*ky)
+        vkx = np.array([1.0, ex], dtype=complex)
+        vky = np.array([1.0, ey], dtype=complex)
+        vkxy = np.array([ex, ey], dtype=complex)
+        vk1xy = np.array([1.0, ex*ey], dtype=complex)
         nambu_periodized = np.zeros((4, 4), dtype=complex)
 
         gup = arg[:4:, :4:]
@@ -151,7 +153,7 @@ class ModelNambu:
                             [llgreen[ii][3, 0], llgreen[ii][3, 3]]
                             ])
 
-            gAB00 = np.dot(np.conjugate(vk), np.dot(block00,vk))
+            gAB00 = np.dot(np.conjugate(vk1xy), np.dot(block00, vk1xy))
 
 
             block01 = np.array([
@@ -159,7 +161,7 @@ class ModelNambu:
                             [llgreen[ii][3, 1], llgreen[ii][3, 2]]
                             ])
 
-            gAB01 = np.dot(np.conjugate(vk), np.dot(block01,vk))
+            gAB01 = np.dot(np.conjugate(vkxy), np.dot(block01, vkxy))
 
 
             block10 = np.array([
@@ -167,7 +169,7 @@ class ModelNambu:
                             [llgreen[ii][1, 3], llgreen[ii][2, 3]]
                             ])
 
-            gAB10 = np.dot(np.conjugate(vk), np.dot(block10,vk))
+            gAB10 = np.dot(np.conjugate(vkxy), np.dot(block10, vkxy))
 
 
             block11 = np.array([
@@ -175,7 +177,7 @@ class ModelNambu:
                             [llgreen[ii][2, 1], llgreen[ii][2, 2]]
                             ])
 
-            gAB11 = np.dot(np.conjugate(vk), np.dot(block11,vk))
+            gAB11 = np.dot(np.conjugate(vk1xy), np.dot(block11, vk1xy))
 
                                 
 
@@ -186,7 +188,7 @@ class ModelNambu:
         nambu_periodized[2::, 2::] = llperiodized[2]
         nambu_periodized[2::, :2:] = llperiodized[3]
 
-        Nc = 2.0
+        Nc = 2.0 #Should be 2.0
         return (nambu_periodized/Nc)
 
 
@@ -206,7 +208,7 @@ class ModelNambu:
         tperp_squared = 2.0*tperp*tperp # integrated over kz (integrate cos(kz)**2.0 = 2.0)
         return (-1.0 * np.real(-tperp_squared*
                                 (2.0*nambu_periodized[0, 2]*nambu_periodized[2, 0] +
-                                 4.0*(nambu_periodized[0, 3]*nambu_periodized[3, 0]) +
+                                 4.0*(nambu_periodized[0, 3]*nambu_periodized[3, 0]) + # le signe ici depend si il ya couplage AFM en z.
                                  2.0*nambu_periodized[1, 3]*nambu_periodized[3, 1]
                                 )
 
@@ -226,7 +228,7 @@ class ModelNambu:
 
 
     def eps0(self, kx, ky):
-        return (-2.0*self.t*(np.cos(kx) + np.cos(ky)) - 2.0*self.tp*np.cos(kx + ky) )
+        return (-2.0*self.t*(np.cos(kx) + np.cos(ky))  - 2.0*self.tp*(np.cos(kx+ky) + np.cos(kx-ky))  -2.0*self.tpp*(np.cos(2.0*kx)+np.cos(2.0*ky)) )
 
     def periodize_cumulant(self, kx: float, ky: float, ii: int): # cumulant periodization
         """ """
