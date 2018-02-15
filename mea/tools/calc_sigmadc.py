@@ -15,7 +15,7 @@ for i in range(10):
     if not os.path.isfile(fname):
         break
     
-    (wvec, sEvec_c) = green.()read_green_c(fname)
-    model = Model(1.0, 0.4 , mu, wvec, sEvec_c)
+    (wvec, sEvec_c) = green().read_green_c(fname)
+    model = Model(1.0, 0.4 , 0.0, mu, wvec, sEvec_c)
     sdc = sigmadc.SigmaDC(model, beta=beta)
     sdc.calc_sigmadc()

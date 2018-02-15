@@ -164,6 +164,12 @@ class Model:
         Akw = -2.0*np.trace(gf_ktilde).imag
         return (Akw / 4.0)
 
+    def Akw2_trace(self, kx: float, ky: float, ii: int) -> float:
+        """ """
+        gf_ktilde = self.build_gf_ktilde(kx, ky, ii)
+        Akw = -2.0*np.trace(np.dot(gf_ktilde.imag, gf_ktilde.imag))
+        return (Akw / 4.0)
+
 
     def calc_dos_with_trace(self, fout_name="dos_trace.txt"):
         """ """
