@@ -51,7 +51,9 @@ class SigmaDC:
                                                                          args=(i,))[0]
                 integrand_w_cum[i] = 1.0 / (2.0 * np.pi)**(2.0) * sI.dblquad(Akw2_cum, -np.pi, np.pi, self.y1, self.y2, epsabs=1e-8,
                                                                              args=(i,))[0]
-                integrand_w_trace[i] = 1.0 / (2.0 * np.pi)**(2.0) * sI.dblquad(Akw2_trace, -np.pi, np.pi, self.y1, self.y2, epsabs=1e-8,
+                N_c = 4.0
+                integrand_w_trace[i] = N_c / (2.0 * np.pi)**(2.0) * sI.dblquad(Akw2_trace, -np.pi / 2.0, np.pi / 2.0,
+                                                                               lambda x: -np.pi / 2.0, lambda x: np.pi / 2.0, epsabs=1e-8,
                                                                                args=(i,))[0]
                 dfd_dw = self.dfd_dw(ww)
                 integrand_w[i] *= -dfd_dw
